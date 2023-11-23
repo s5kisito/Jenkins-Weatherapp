@@ -11,6 +11,11 @@ pipeline {
 
     stages {
         stage('Build') {
+            agent {
+                docker {
+                    image 'golang:alpine'
+                }
+            }
             steps {
                 script {
                     catchError {
@@ -21,12 +26,14 @@ pipeline {
         }
 
         stage('Print Working Directory') {
+            agent any
             steps {
                 sh 'pwd'
             }
         }
 
         stage('List Directory Contents') {
+            agent any
             steps {
                 sh 'ls -al'
             }
