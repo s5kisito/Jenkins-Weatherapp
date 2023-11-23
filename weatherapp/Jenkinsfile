@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'golang:alpine'
-        }
-    }
+    agent any
 
     options {
         buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '5', numToKeepStr: '5')
@@ -26,14 +22,12 @@ pipeline {
         }
 
         stage('Print Working Directory') {
-            agent any
             steps {
                 sh 'pwd'
             }
         }
 
         stage('List Directory Contents') {
-            agent any
             steps {
                 sh 'ls -al'
             }
