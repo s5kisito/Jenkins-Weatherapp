@@ -7,15 +7,13 @@ pipeline {
 
     stages {
         stage('Build') {
-            agent {
-                docker {
-                    image 'golang:alpine'
-                }
-            }
             steps {
                 script {
                     catchError {
-                        sh 'go build -o /go/bin/app ./weatherapp/auth/src/main'
+                        // Use the container directive for running Docker within a Docker
+                        container('golang:alpine') {
+                            sh 'go build -o /go/bin/app ./weatherapp/auth/src/main'
+                        }
                     }
                 }
             }
