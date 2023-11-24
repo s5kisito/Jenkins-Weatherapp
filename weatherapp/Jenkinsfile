@@ -87,21 +87,25 @@ pipeline {
     agent any
 
     stages {
-        stage('Login to Docker Hub') {
-            steps {
-                script {
-                    // Define your Docker Hub credentials
-                    def dockerHubUser = 'kisito2'
-                    def dockerHubPassword = 'chriseven'
 
-                    // Docker login command
-                    sh "docker login -u ${dockerHubUser} -p ${dockerHubPassword}"
-                }
-            }
+      stage('Login to Docker Hub') {  
+      steps {
+        script {
+            // Define your Docker Hub username and access token
+            def dockerHubUser = 'kisito2'
+            def dockerHubAccessToken = 'dckr_pat_BsJ_HqhkoOw66SYpHsK7q5EcCBw'
+
+            // Docker login command with access token
+            sh "echo ${dockerHubAccessToken} | docker login -u ${dockerHubUser} --password-stdin"
         }
-    }
+      }
 
+
+      }
+    }
 }
+
+
 
 
              
