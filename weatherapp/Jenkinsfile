@@ -1,67 +1,66 @@
-// pipeline {
-//     agent any
-
-//     options {
-//         buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '5', numToKeepStr: '5')
-//     }
-
-//     stages {
-
-//         stage('Test auth') {
-// 	     agent {
-//             docker {
-//               image 'golang:alpine'
-//               args '-u root:root'
-//             }
-//            }
-//             steps {
-//                 sh '''
-//             id
-//             cd weatherapp/auth/src/main
-//             go build 
-//             cd -
-//             ls -la
-//                 '''
-//             }
-//         }
-
-//         stage('Test UI') {
-// 	     agent {
-//             docker {
-//               image 'node:17'
-//               args '-u root:root'
-//             }
-//            }
-//             steps {
-//                 sh '''
-//             id
-//             cd weatherapp/UI
-//             npm run
-//             ls -la
-//                 '''
-//             }
-//         }  
-
-//         stage('Test weather') {
-// 	     agent {
-//             docker {
-//               image 'python:3.8-slim-buster'
-//               args '-u root:root'
-//             }
-//            }
-//             steps {
-//                 sh '''
-//             id
-//             cd weatherapp/weather
-//              pip3 install -r requirements.txt
-//             ls -la
-//                 '''
-//             }
-//         }
 pipeline {
-  agent any
+    agent any
 
-   stages {
+    options {
+        buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '5', numToKeepStr: '5')
+    }
+
+    stages {
+
+        stage('Test auth') {
+	     agent {
+            docker {
+              image 'golang:alpine'
+              args '-u root:root'
+            }
+           }
+            steps {
+                sh '''
+            id
+            cd weatherapp/auth/src/main
+            go build 
+            cd -
+            ls -la
+                '''
+            }
+        }
+
+        stage('Test UI') {
+	     agent {
+            docker {
+              image 'node:17'
+              args '-u root:root'
+            }
+           }
+            steps {
+                sh '''
+            id
+            cd weatherapp/UI
+            npm run
+            ls -la
+                '''
+            }
+        }  
+
+        stage('Test weather') {
+	     agent {
+            docker {
+              image 'python:3.8-slim-buster'
+              args '-u root:root'
+            }
+           }
+            steps {
+                sh '''
+            id
+            cd weatherapp/weather
+             pip3 install -r requirements.txt
+            ls -la
+                '''
+            }
+        }
+
+
+  
 
         stage('SonarQube analysis') {
             agent {
