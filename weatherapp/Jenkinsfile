@@ -103,25 +103,32 @@ pipeline {
       }
 
 
-      stage('Build and Push Auth') {
-        when {
-        expression {
-            env.GIT_BRANCH == 'origin/develop'
-        }
-        }
-        steps {
-        script {
-            echo 'Building and pushing auth image...'
-            dir("$WORKSPACE/weatherapp/auth") {
-                // Build Docker image
-                sh "docker build -t kisito2/weatherapp-auth:${BUILD_NUMBER} ."
-                
-                // Push Docker image
-                sh "docker push kisito2/weatherapp-auth:${BUILD_NUMBER}"
+        stage('Build and Push Auth') {          
+            when {
+                expression {
+                    env.GIT_BRANCH == 'origin/develop'
+                }
+            }
+            steps {
+                script {
+                    echo 'Building and pushing auth image...'
+                    dir("$WORKSPACE/weatherapp/auth") {
+                        echo "Current directory: ${pwd()}"
+                        
+                        // List files in the current directory for debugging
+                        sh 'ls -l'
+                        
+                        // Build Docker image
+                        sh "docker build -t devopseasylearning/weatherapp-auth:${BUILD_NUMBER} ."
+                        
+                        // Push Docker image
+                        sh "docker push devopseasylearning/weatherapp-auth:${BUILD_NUMBER}"
+                    }
+                }
             }
         }
-        }
-      }
+    
+
     }
 }
     
