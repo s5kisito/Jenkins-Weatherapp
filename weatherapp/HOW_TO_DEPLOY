@@ -21,7 +21,8 @@
           * check important file if required  ----> sonarqube property file required
           * build code binary if required   language ( Node, go, python ) 
        CODE SCANNING
-        * scan the code using sonar-scanner  ----> check sonar-scanner --> jenkins ---->  sonarqube connection
+        * scan the code using sonar-scanner  ----> check sonar-scanner --> jenkins ---->sonarqube connection {cp sonar-project.properties ../sonar-project.properties}
+}
         * report to sonarqube UI         ---->  sonarqube, jenkins connection
        CODE QUALITY
         * check quality gate 
