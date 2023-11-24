@@ -1,12 +1,12 @@
-#build stage
+# build stage
 FROM golang:alpine AS builder
 RUN apk add git
 WORKDIR /go/src/app
-COPY  weatherapp /go/src/app
+COPY . .
 WORKDIR /go/src/app/weatherapp/auth/src/main
 RUN go build -o /go/bin/app -v ./...
 
-#final stage
+# final stage
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 COPY --from=builder /go/bin/app /app
