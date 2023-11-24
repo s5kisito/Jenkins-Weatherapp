@@ -1,49 +1,20 @@
-pipeline {
-    agent {
-        docker {
-            image 'golang:alpine'
-        }
-    }
 
-    options {
-        buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '5', numToKeepStr: '5')
-    }
+pipeline {
+    agent any
 
     stages {
-        stage('Build') {
-            agent {
-                docker {
-                    image 'golang:alpine'
-                }
-            }
+        stage('Login to Docker Hub') {
             steps {
                 script {
-                    catchError {
-                        sh 'go build -o /go/bin/app ./weatherapp/auth/src/main'
-                    }
+                    // Define your Docker Hub credentials
+                    def dockerHubUser = 'christ.nyc@gmail.com'
+                    def dockerHubPassword = 'chriseven'
+
+                    // Docker login command
+                    sh "docker login -u ${dockerHubUser} -p ${dockerHubPassword}"
                 }
             }
-        }
-
-        stage('Print Working Directory') {
-            agent any
-            steps {
-                sh 'pwd'
-            }
-        }
-
-        stage('List Directory Contents') {
-            agent any
-            steps {
-                sh 'ls -al'
-            }
-        }
-    }
-
-    post {
-        always {
-            // Archive or publish build artifacts
-            archiveArtifacts(artifacts: '/go/bin/app')
         }
     }
 }
+
