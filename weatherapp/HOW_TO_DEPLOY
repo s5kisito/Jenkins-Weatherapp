@@ -19,7 +19,7 @@
        CODE
           * clone the code  ---->  setup  a webhook
           * check important file if required  ----> sonarqube property file required
-          * build code binary if required   language ( Node, go, python )
+          * build code binary if required   language ( Node, go, python ) 
        CODE SCANNING
         * scan the code using sonar-scanner  ----> check sonar-scanner --> jenkins ---->  sonarqube connection
         * report to sonarqube UI         ---->  sonarqube, jenkins connection

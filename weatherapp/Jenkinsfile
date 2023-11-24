@@ -6,36 +6,24 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
-            steps {
-                script {
-                    catchError {
-                        // Use the container directive for running Docker within a Docker
-                        container('golang:alpine') {
-                            sh 'go build -o /go/bin/app ./weatherapp/auth/src/main'
-                        }
-                    }
-                }
-            }
-        }
 
-        stage('Print Working Directory') {
-            steps {
-                sh 'pwd'
+         stage('Test auth') {
+	     agent {
+            docker {
+              image 'golang:alpine'
+              args '-u root:root'
             }
-        }
-
-        stage('List Directory Contents') {
+           }
             steps {
-                sh 'ls -al'
+                sh '''
+            id
+            cd weatherapp/auth/src/main
+            go build 
+            cd -
+            ls -la
+                '''
             }
-        }
-    }
-
-    post {
-        always {
-            // Archive or publish build artifacts
-            archiveArtifacts(artifacts: '/go/bin/app')
-        }
+         }
     }
 }
+                                
