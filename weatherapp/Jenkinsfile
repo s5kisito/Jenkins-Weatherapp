@@ -39,7 +39,11 @@ pipeline {
             npm run
             ls -la
                 '''
-              
+            }
+        }  
+
+    }
+}
              
 
 
@@ -50,6 +54,6 @@ pipeline {
 
 
 
-    }
-}
+
+
                                 
