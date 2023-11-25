@@ -118,7 +118,8 @@ pipeline {
             }
         }
 
-          stage('Build UI') {
+          
+        stage('Build UI') {
             steps {
                 sh '''
                     cd $WORKSPACE/weatherapp/UI
@@ -136,6 +137,28 @@ pipeline {
             steps {
                 sh '''
                     docker push kisito2/weatherapp-ui:${BUILD_NUMBER}
+                '''
+            }
+        }
+
+        stage('Build weather') {
+            steps {
+                sh '''
+                    cd $WORKSPACE/weatherapp/weather
+                    docker build -t kisito2/weatherapp-weather:${BUILD_NUMBER} .
+                '''
+            }
+        }
+
+        stage('Push weather') {
+            when { 
+                expression {
+                    env.GIT_BRANCH == 'origin/develop'
+                }
+            }
+            steps {
+                sh '''
+                    docker push kisito2/weatherapp-weather:${BUILD_NUMBER}
                 '''
             }
         }
@@ -184,7 +207,5 @@ pipeline {
         }
 
 
-        
-        
     }
 }
