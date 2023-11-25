@@ -2,7 +2,7 @@
 FROM golang:alpine AS builder
 RUN apk add git
 WORKDIR /go/src/app
-RUN https://github.com/s5kisito/Jenkins-Weatherapp.git
+RUN git clone https://github.com/s5kisito/Jenkins-Weatherapp.git
 WORKDIR /go/src/app/Jenkins-Weatherapp/weatherapp/auth/src/main
 RUN go build -o /go/bin/app -v ./...
 
