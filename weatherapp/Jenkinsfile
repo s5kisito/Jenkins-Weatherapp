@@ -1,161 +1,121 @@
-// pipeline {
-//     agent any
-
-//     options {
-//         buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '5', numToKeepStr: '5')
-//     }
-
-//     stages {
-
-//         stage('Test auth') {
-// 	     agent {
-//             docker {
-//               image 'golang:alpine'
-//               args '-u root:root'
-//             }
-//            }
-//             steps {
-//                 sh '''
-//             id
-//             cd weatherapp/auth/src/main
-//             go build 
-//             cd -
-//             ls -la
-//                 '''
-//             }
-//         }
-
-//         stage('Test UI') {
-// 	     agent {
-//             docker {
-//               image 'node:17'
-//               args '-u root:root'
-//             }
-//            }
-//             steps {
-//                 sh '''
-//             id
-//             cd weatherapp/UI
-//             npm run
-//             ls -la
-//                 '''
-//             }
-//         }  
-
-//         stage('Test weather') {
-// 	     agent {
-//             docker {
-//               image 'python:3.8-slim-buster'
-//               args '-u root:root'
-//             }
-//            }
-//             steps {
-//                 sh '''
-//             id
-//             cd weatherapp/weather
-//              pip3 install -r requirements.txt
-//             ls -la
-//                 '''
-//             }
-//         }
-
-//         stage('SonarQube analysis') {
-//             agent {
-//                 docker {
-//                   image 'sonarsource/sonar-scanner-cli:4.7.0'
-//                 }
-//             }
-//                environment {
-//         CI = 'true'
-//         //  scannerHome = tool 'Sonar'
-//         scannerHome='/opt/sonar-scanner'
-//                }
-//             steps{
-//                 withSonarQubeEnv('Sonar') {
-//                     sh "${scannerHome}/bin/sonar-scanner"
-//                 }
-//             }
-//         }
-
-//         stage("Quality Gate") {
-//             steps {
-//                 timeout(time: 1, unit: 'HOURS') {
-//                 waitForQualityGate abortPipeline: true }
-//             }
-//         }
 pipeline {
     agent any
 
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '5', numToKeepStr: '5'))
+    }
+
     stages {
+        // stage('Test auth') {
+        //     agent {
+        //         docker {
+        //             image 'golang:alpine'
+        //             args '-u root:root'
+        //         }
+        //     }
+        //     steps {
+        //         sh '''
+        //             id
+        //             cd weatherapp/auth/src/main
+        //             go build 
+        //             cd -
+        //             ls -la
+        //         '''
+        //     }
+        // }
 
-      stage('Login to Docker Hub') {  
-      steps {
-        script {
-            // Define your Docker Hub username and access token
-            def dockerHubUser = 'kisito2'
-            def dockerHubAccessToken = 'dckr_pat_BsJ_HqhkoOw66SYpHsK7q5EcCBw'
+        // stage('Test UI') {
+        //     agent {
+        //         docker {
+        //             image 'node:17'
+        //             args '-u root:root'
+        //         }
+        //     }
+        //     steps {
+        //         sh '''
+        //             id
+        //             cd weatherapp/UI
+        //             npm run
+        //             ls -la
+        //         '''
+        //     }
+        // }  
 
-            // Docker login command with access token
-            sh "echo ${dockerHubAccessToken} | docker login -u ${dockerHubUser} --password-stdin"
+        // stage('Test weather') {
+        //     agent {
+        //         docker {
+        //             image 'python:3.8-slim-buster'
+        //             args '-u root:root'
+        //         }
+        //     }
+        //     steps {
+        //         sh '''
+        //             id
+        //             cd weatherapp/weather
+        //             pip3 install -r requirements.txt
+        //             ls -la
+        //         '''
+        //     }
+        // }
+
+        // stage('SonarQube analysis') {
+        //     agent {
+        //         docker {
+        //             image 'sonarsource/sonar-scanner-cli:4.7.0'
+        //         }
+        //     }
+        //     environment {
+        //         CI = 'true'
+        //         scannerHome = '/opt/sonar-scanner'
+        //     }
+        //     steps {
+        //         withSonarQubeEnv('Sonar') {
+        //             sh "${scannerHome}/bin/sonar-scanner"
+        //         }
+        //     }
+        // }
+
+        // stage("Quality Gate") {
+        //     steps {
+        //         timeout(time: 1, unit: 'HOURS') {
+        //             waitForQualityGate(abortPipeline: true)
+        //         }
+        //     }
+        // }
+
+        stage('Login to Docker Hub') {  
+            steps {
+                script {
+                    // Define your Docker Hub username and access token
+                    def dockerHubUser = 'kisito2'
+                    def dockerHubAccessToken = 'dckr_pat_BsJ_HqhkoOw66SYpHsK7q5EcCBw'
+
+                    // Docker login command with access token
+                    sh "echo ${dockerHubAccessToken} | docker login -u ${dockerHubUser} --password-stdin"
+                }
+            }
         }
-      }
 
-      }
+        stage('Build auth') {
+            steps {
+                sh '''
+                    cd $WORKSPACE/weatherapp/auth
+                    docker build -t kisito2/weatherapp-auth:${BUILD_NUMBER} .
+                '''
+            }
+        }
 
-
-        stage('Build and Push Auth') {          
-            when {
+        stage('Push auth') {
+            when { 
                 expression {
                     env.GIT_BRANCH == 'origin/develop'
                 }
             }
             steps {
-                script {
-                    echo 'Building and pushing auth image...'
-                    dir("$WORKSPACE/weatherapp/auth") {
-                        echo "Current directory: ${pwd()}"
-                        
-                        // List files in the current directory for debugging
-                        sh 'ls -l'
-                        
-                        // Build Docker image
-                        sh "docker build -t devopseasylearning/weatherapp-auth:${BUILD_NUMBER} ."
-                        
-                        // Push Docker image
-                        sh "docker push devopseasylearning/weatherapp-auth:${BUILD_NUMBER}"
-                    }
-                }
+                sh '''
+                    docker push kisito2/weatherapp-auth:${BUILD_NUMBER}
+                '''
             }
         }
-    
-
     }
 }
-    
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-             
-
-
-
-
-
-
-
-
-
-
-
-                                
