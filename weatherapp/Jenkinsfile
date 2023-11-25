@@ -117,5 +117,27 @@ pipeline {
                 '''
             }
         }
+
+          stage('Build UI') {
+            steps {
+                sh '''
+                    cd $WORKSPACE/weatherapp/UI
+                    docker build -t kisito2/weatherapp-ui:${BUILD_NUMBER} .
+                '''
+            }
+        }
+
+        stage('Push UI') {
+            when { 
+                expression {
+                    env.GIT_BRANCH == 'origin/develop'
+                }
+            }
+            steps {
+                sh '''
+                    docker push kisito2/weatherapp-ui:${BUILD_NUMBER}
+                '''
+            }
+        }
     }
 }
