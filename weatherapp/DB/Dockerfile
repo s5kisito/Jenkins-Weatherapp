@@ -1,1 +1,5 @@
-FROM devopseasylearning/weatherapp-db:v0.0.1
+FROM mysql:8.0-debian
+ENV MYSQL_ROOT_PASSWORD=s5kisito
+ENV MYSQL_DATABASE=s5_kisito_db
+ENV MYSQL_USER=s5_kisito
+ENV MYSQL_PASSWORD=s5kisito
