@@ -139,18 +139,17 @@ pipeline {
                 '''
             }
         }
-
-
-        stage('Build weather') {
+        
+        stage('Build DB') {
             steps {
                 sh '''
-                    cd $WORKSPACE/weatherapp/weather
-                    docker build -t kisito2/weatherapp-weather:${BUILD_NUMBER} .
+                    cd $WORKSPACE/weatherapp/DB
+                    docker build -t kisito2/weatherapp-db:${BUILD_NUMBER} .
                 '''
             }
         }
 
-        stage('Push weather') {
+        stage('Push DB') {
             when { 
                 expression {
                     env.GIT_BRANCH == 'origin/develop'
@@ -158,9 +157,34 @@ pipeline {
             }
             steps {
                 sh '''
-                    docker push kisito2/weatherapp-weather:${BUILD_NUMBER}
+                    docker push kisito2/weatherapp-db:${BUILD_NUMBER}
                 '''
             }
         }
+              stage('Build REDIS') {
+            steps {
+                sh '''
+                    cd $WORKSPACE/weatherapp/REDIS
+                    docker build -t kisito2/weatherapp-redis:${BUILD_NUMBER} .
+                '''
+            }
+        }
+
+        stage('Push REDIS') {
+            when { 
+                expression {
+                    env.GIT_BRANCH == 'origin/develop'
+                }
+            }
+            steps {
+                sh '''
+                    docker push kisito2/weatherapp-redis:${BUILD_NUMBER}
+                '''
+            }
+        }
+
+
+        
+        
     }
 }
