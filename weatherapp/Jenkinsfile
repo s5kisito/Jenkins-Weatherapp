@@ -210,7 +210,7 @@ pipeline {
                 branch 'develop'
             }
             agent {
-                label 'PROD'
+                label 'PRODUCTION'
             }
             steps {
                 script {
