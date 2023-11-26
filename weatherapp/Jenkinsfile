@@ -1,5 +1,7 @@
 pipeline {
-    // agent any
+    agent { 
+        label "PRODUCTIONt"
+    }
 
     options {
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '5', numToKeepStr: '5'))
@@ -208,11 +210,12 @@ pipeline {
        stage('warning') {
 	      agent { 
                 label "PRODUCTIONt"
-                 }
+       }
          when{ 
           expression {
-            env.GIT_BRANCH == 'origin/develop' }
-            }
+            env.GIT_BRANCH == 'origin/develop' 
+          }
+         }
       steps {
         script {
             notifyUpgrade(currentBuild.currentResult, "WARNING")
