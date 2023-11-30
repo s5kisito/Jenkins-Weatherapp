@@ -1,5 +1,5 @@
 FROM mysql:8.0-debian
-ENV MYSQL_ROOT_PASSWORD= my-secret-pw
+ENV MYSQL_ROOT_PASSWORD=my-secret-pw
 ENV MYSQL_DATABASE=s5_kisito_db
 ENV MYSQL_USER=s5_kisito
 ENV MYSQL_PASSWORD=s5kisito
