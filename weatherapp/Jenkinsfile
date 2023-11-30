@@ -207,22 +207,44 @@ pipeline {
     //             '''
     //         }
     //     }
-       stage('warning') {
-	      agent { 
-                label "PRODUCTION"
-       }
-         when{ 
-          expression {
-            env.GIT_BRANCH == 'origin/develop' 
-          }
-         }
-      steps {
+      //  stage('warning') {
+	    //   agent { 
+      //           label "PRODUCTION"
+      //  }
+      //    when{ 
+      //     expression {
+      //       env.GIT_BRANCH == 'origin/develop' 
+      //     }
+      //    }
+      // steps {
+      //   script {
+      //       notifyUpgrade(currentBuild.currentResult, "WARNING")
+      //       sleep(time:env.WARNTIME, unit:"MINUTES")
+      //   }
+      // }
+      //  }
+         stage('warning') {
+    agent {
+        label "PRODUCTION"
+    }
+    when {
+        expression {
+            env.GIT_BRANCH == 'origin/develop'
+        }
+    }
+    steps {
         script {
             notifyUpgrade(currentBuild.currentResult, "WARNING")
-            sleep(time:env.WARNTIME, unit:"MINUTES")
+            
+            // Set WARNTIME to 1 minute
+            env.WARNTIME = 1
+
+            // Use the sleep function with the defined WARNTIME variable
+            sleep(time: env.WARNTIME, unit: "MINUTES")
         }
-      }
+    }
        }
+
 
         stage('Generate-compose') {
 	      agent { 
