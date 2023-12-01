@@ -1,6 +1,6 @@
 pipeline {
     agent { 
-        label "PRODUCTION"
+        label "QUALITY-ASSURANCE"
     }
 
     options {
@@ -224,15 +224,7 @@ pipeline {
                         string(credentialsId: 'WEATHERAPP_REDIS_PASSWORD', variable: 'WEATHERAPP_REDIS_PASSWORD'),
                         string(credentialsId: 'WEATHERAPP_DB_PASSWORD', variable: 'WEATHERAPP_DB_PASSWORD'),
                         string(credentialsId: 'WEATHERAPP_APIKEY', variable: 'WEATHERAPP_APIKEY')
-                    ]) {
-                        // Your pipeline steps using the variables
-                        // For example:
-                        echo "MySQL Root Password: ${WEATHERAPP_MYSQL_ROOT_PASSWORD}"
-                        echo "Redis Password: ${WEATHERAPP_REDIS_PASSWORD}"
-                        echo "DB Password: ${WEATHERAPP_DB_PASSWORD}"
-                        echo "API Key: ${WEATHERAPP_APIKEY}"
-                    }
-                    // Include your actual pipeline steps using these variables
+                    ]) 
                 }
             }
         }

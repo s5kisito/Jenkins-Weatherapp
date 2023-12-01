@@ -8,7 +8,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${WEATHERAPP_MYSQL_ROOT_PASSWORD}
     volumes:
       - db-data:/var/lib/mysql
-    networks: WEATHERAPP_
+    networks: WEATHERAPP
       - weatherapp
     restart: always
 
