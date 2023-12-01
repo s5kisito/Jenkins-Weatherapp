@@ -225,9 +225,15 @@ pipeline {
                         string(credentialsId: 'WEATHERAPP_REDIS_PASSWORD', variable: 'WEATHERAPP_REDIS_PASSWORD'),
                         string(credentialsId: 'WEATHERAPP_DB_PASSWORD', variable: 'WEATHERAPP_DB_PASSWORD'),
                         string(credentialsId: 'WEATHERAPP_APIKEY', variable: 'WEATHERAPP_APIKEY')
-                    ]) 
-                   
-                
+                    ]) {
+                        // Inside this block, the credentials will be available as environment variables
+                        // Use the environment variables in your pipeline steps as needed
+                        sh 'echo $WEATHERAPP_MYSQL_ROOT_PASSWORD'
+                        sh 'echo $WEATHERAPP_REDIS_PASSWORD'
+                        sh 'echo $WEATHERAPP_DB_PASSWORD'
+                        sh 'echo $WEATHERAPP_APIKEY'
+                        // Add more commands using the environment variables as needed
+                    }
                 }
 
             }
