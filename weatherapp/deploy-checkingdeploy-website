@@ -1,0 +1,53 @@
+
+        stage('Deploy') {
+            agent { 
+                label "PRODUCTION"
+            }
+            when { 
+                expression {
+                    env.GIT_BRANCH == 'origin/develop'
+                }
+            }
+            steps {
+                sh '''
+                    docker-compose down --remove-orphans || true
+                    docker-compose up -d 
+                    docker-compose ps 
+                '''
+            }
+        }
+
+        stage('checking deployment') {
+            agent { 
+                label "PRODUCTION"
+            }
+            when { 
+                expression {
+                    env.GIT_BRANCH == 'origin/develop'
+                }
+            }
+            steps {
+                sh '''
+                    bash weatherapp/check.sh
+                '''
+            }
+        }
+
+        stage('checking website') {
+            agent { 
+                label "PRODUCTION"
+            }
+            when { 
+                expression {
+                    env.GIT_BRANCH == 'origin/develop'
+                }
+            }
+            steps {
+                sh '''
+                    sleep 10
+                    bash weatherapp/check-login.sh
+                '''
+            }
+        }
+    }
+}
