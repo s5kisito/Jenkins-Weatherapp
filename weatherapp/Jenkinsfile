@@ -209,42 +209,28 @@ pipeline {
         }
 
         stage('Generate-compose') {
-    agent {
-        label "PRODUCTION"
-    }
-    when {
-        expression {
-            env.GIT_BRANCH == 'origin/develop'
-        }
-    } 
-    steps {
-        script {
-            try {
-                withCredentials([
-                    string(credentialsId: 'WEATHERAPP_MYSQL_ROOT_PASSWORD', variable: 'WEATHERAPP_MYSQL_ROOT_PASSWORD'),
-                    string(credentialsId: 'WEATHERAPP_REDIS_PASSWORD', variable: 'WEATHERAPP_REDIS_PASSWORD'),
-                    string(credentialsId: 'WEATHERAPP_DB_PASSWORD', variable: 'WEATHERAPP_DB_PASSWORD'),
-                    string(credentialsId: 'WEATHERAPP_APIKEY', variable: 'WEATHERAPP_APIKEY')
-                ]) {
-                    // Inside this block, the credentials will be available as environment variables
-                    // Use the environment variables in your pipeline steps as needed
-                    echo "MySQL Root Password: $WEATHERAPP_MYSQL_ROOT_PASSWORD"
-                    echo "Redis Password: $WEATHERAPP_REDIS_PASSWORD"
-                    echo "DB Password: $WEATHERAPP_DB_PASSWORD"
-                    echo "API Key: $WEATHERAPP_APIKEY"
-
-                    // Add more commands using the environment variables as needed
+            agent { 
+                label "s5-prod-agent"
+            }
+            when { 
+                expression {
+                    env.GIT_BRANCH == 'origin/develop'
                 }
-            } catch (Exception e) {
-                echo "Error: ${e.message}"
-                currentBuild.result = 'FAILURE'
-                error("Failed to retrieve credentials. Check credential IDs.")
+            }
+            steps {
+                script {
+                    withCredentials([
+                        string(credentialsId: 'WEATHERAPP_MYSQL_ROOT_PASSWORD', variable: 'WEATHERAPP_MYSQL_ROOT_PASSWORD'),
+                        string(credentialsId: 'WEATHERAPP_REDIS_PASSWORD', variable: 'WEATHERAPP_REDIS_PASSWORD'),
+                        string(credentialsId: 'WEATHERAPP_DB_PASSWORD', variable: 'WEATHERAPP_DB_PASSWORD'),
+                        string(credentialsId: 'WEATHERAPP_APIKEY', variable: 'WEATHERAPP_APIKEY')
+                    ]) {
+                        // Your script goes here
+                    }
+                }
             }
         }
-    }
-}
 
-            
         stage('Deploy') {
             agent { 
                 label "PRODUCTION"
@@ -297,7 +283,7 @@ pipeline {
         }
     }
 }
-        
+
     
     
 
