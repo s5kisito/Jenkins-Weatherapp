@@ -210,7 +210,7 @@ pipeline {
 
         stage('Generate-compose') {
             agent { 
-                label "s5-prod-agent"
+                label "PRODUCTION"
             }
             when { 
                 expression {
