@@ -224,15 +224,13 @@ pipeline {
                         string(credentialsId: 'WEATHERAPP_REDIS_PASSWORD', variable: 'WEATHERAPP_REDIS_PASSWORD'),
                         string(credentialsId: 'WEATHERAPP_DB_PASSWORD', variable: 'WEATHERAPP_DB_PASSWORD'),
                         string(credentialsId: 'WEATHERAPP_APIKEY', variable: 'WEATHERAPP_APIKEY')
-                    ]) 
-                }
-            }
-                        cat <<EOF > docker-compose.yml
+                    ]) {
+                        writeFile file: 'docker-compose.yml', text: '''
 version: '3.5'
 services:
   db:
     container_name: weatherapp-db
-    image: devopseasylearning/weatherapp-db: ${BUILD_NUMBER}
+    image: devopseasylearning/weatherapp-db:${BUILD_NUMBER}
     environment:
       MYSQL_ROOT_PASSWORD: ${WEATHERAPP_MYSQL_ROOT_PASSWORD}
     volumes:
@@ -243,7 +241,7 @@ services:
 
   redis:
     container_name: weatherapp-redis
-    image: devopseasylearning/weatherapp-redis: ${BUILD_NUMBER}
+    image: devopseasylearning/weatherapp-redis:${BUILD_NUMBER}
     networks:
       - weatherapp
     environment:
@@ -269,7 +267,7 @@ services:
 
   auth:
     container_name: weatherapp-auth
-    image: devopseasylearning/weatherapp-auth: ${BUILD_NUMBER}
+    image: devopseasylearning/weatherapp-auth:${BUILD_NUMBER}
     environment:
       DB_HOST: db
       DB_PASSWORD: ${WEATHERAPP_DB_PASSWORD}
@@ -280,7 +278,10 @@ services:
     restart: always
     depends_on:
       - weather
-
+'''
+                    }
+                }
+            }
         }
 
         stage('Deploy') {
@@ -333,8 +334,7 @@ services:
                 '''
             }
         }
-
-
     }
 }
+
 
