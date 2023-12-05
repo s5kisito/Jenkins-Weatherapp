@@ -225,7 +225,7 @@ pipeline {
                         string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
                         string(credentialsId: 'APIKEY', variable: 'APIKEY')
                     ]) {
-                        writeFile file: 'docker-compose.yml', text: '''
+                        def dockerComposeContent = '''
 version: '3.5'
 services:
   db:
