@@ -220,10 +220,10 @@ pipeline {
             steps {
                 script {
                     withCredentials([
-                        string(credentialsId: 'WEATHERAPP_MYSQL_ROOT_PASSWORD', variable: 'WEATHERAPP_MYSQL_ROOT_PASSWORD'),
-                        string(credentialsId: 'WEATHERAPP_REDIS_PASSWORD', variable: 'WEATHERAPP_REDIS_PASSWORD'),
-                        string(credentialsId: 'DB_PASSWORD', variable: 'WEATHERAPP_DB_PASSWORD'),
-                        string(credentialsId: 'WEATHERAPP_APIKEY', variable: 'WEATHERAPP_APIKEY')
+                        string(credentialsId: 'MYSQL_ROOT_PASSWORD', variable: 'MYSQL_ROOT_PASSWORD'),
+                        string(credentialsId: 'REDIS_PASSWORD', variable: 'REDIS_PASSWORD'),
+                        string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
+                        string(credentialsId: 'APIKEY', variable: 'APIKEY')
                     ]) {
                         writeFile file: 'docker-compose.yml', text: '''
 version: '3.5'
@@ -232,7 +232,7 @@ services:
     container_name: weatherapp-db
     image: devopseasylearning/weatherapp-db:${BUILD_NUMBER}
     environment:
-      MYSQL_ROOT_PASSWORD: ${WEATHERAPP_MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - db-data:/var/lib/mysql
     networks:   
@@ -246,7 +246,7 @@ services:
       - weatherapp
     environment:
       REDIS_USER: redis
-      REDIS_PASSWORD: ${WEATHERAPP_REDIS_PASSWORD}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     volumes:
       - redis-data:/data
     restart: always
@@ -257,7 +257,7 @@ services:
     expose:
       - 5000
     environment:
-      APIKEY: ${WEATHERAPP_APIKEY}
+      APIKEY: ${APIKEY}
     networks:
       - weatherapp
     restart: always
@@ -270,7 +270,7 @@ services:
     image: devopseasylearning/weatherapp-auth:${BUILD_NUMBER}
     environment:
       DB_HOST: db
-      DB_PASSWORD: ${WEATHERAPP_DB_PASSWORD}
+      DB_PASSWORD: ${DB_PASSWORD}
     expose:
       - 8080
     networks:
