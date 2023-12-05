@@ -5,7 +5,7 @@ services:
     container_name: weatherapp-db
     image: devopseasylearning/weatherapp-db:${BUILD_NUMBER}
     environment:
-      MYSQL_ROOT_PASSWORD: ${WEATHERAPP_MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - db-data:/var/lib/mysql
     networks: WEATHERAPP
@@ -19,7 +19,7 @@ services:
       - weatherapp
     environment:
       REDIS_USER: redis
-      REDIS_PASSWORD: ${WEATHERAPP_REDIS_PASSWORD}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     volumes:
       - redis-data:/data
     restart: always
@@ -30,7 +30,7 @@ services:
     expose:
       - 5000
     environment:
-      APIKEY: ${WEATHERAPP_APIKEY}
+      APIKEY: ${APIKEY}
     networks:
       - weatherapp
     restart: always
@@ -60,7 +60,7 @@ services:
      WEATHER_HOST: weather
      WEATHER_PORT: 5000
      REDIS_USER: redis
-     REDIS_PASSWORD: ${WEATHERAPP_REDIS_PASSWORD}
+     REDIS_PASSWORD: ${REDIS_PASSWORD}
     expose:
       - 3000
     ports:
