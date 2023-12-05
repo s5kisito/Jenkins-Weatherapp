@@ -42,7 +42,7 @@ services:
     image: devopseasylearning/weatherapp-auth:BUILD_NUMBER
     environment:
       DB_HOST: db
-      DB_PASSWORD: ${WEATHERAPP_DB_PASSWORD}
+      DB_PASSWORD: ${DB_PASSWORD}
     expose:
       - 8080
     networks:

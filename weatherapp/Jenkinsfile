@@ -222,7 +222,7 @@ pipeline {
                     withCredentials([
                         string(credentialsId: 'WEATHERAPP_MYSQL_ROOT_PASSWORD', variable: 'WEATHERAPP_MYSQL_ROOT_PASSWORD'),
                         string(credentialsId: 'WEATHERAPP_REDIS_PASSWORD', variable: 'WEATHERAPP_REDIS_PASSWORD'),
-                        string(credentialsId: 'WEATHERAPP_DB_PASSWORD', variable: 'WEATHERAPP_DB_PASSWORD'),
+                        string(credentialsId: 'DB_PASSWORD', variable: 'WEATHERAPP_DB_PASSWORD'),
                         string(credentialsId: 'WEATHERAPP_APIKEY', variable: 'WEATHERAPP_APIKEY')
                     ]) {
                         writeFile file: 'docker-compose.yml', text: '''
