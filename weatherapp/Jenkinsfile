@@ -209,81 +209,111 @@ pipeline {
             }
         }
 
-        stage('Generate-compose') {
-            agent { 
-                label "PRODUCTION"
+         stage('Generate-compose') {
+	      agent { 
+                label "s5-prod-agent"
+                 }
+         when{ 
+          expression {
+            env.GIT_BRANCH == 'origin/develop' }
             }
-            when { 
-                expression {
-                    env.GIT_BRANCH == 'origin/develop'
-                }
-            }
-            steps {
-                script {
-                    withCredentials([
-                        string(credentialsId: 'MYSQL_ROOT_PASSWORD', variable: 'MYSQL_ROOT_PASSWORD'),
-                        string(credentialsId: 'REDIS_PASSWORD', variable: 'REDIS_PASSWORD'),
-                        string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
-                        string(credentialsId: 'APIKEY', variable: 'APIKEY')
-                    ]) {
-                        def dockerComposeContent = '''
-                            version: '3.5'
-                            services:
-                              db:
-                                container_name: weatherapp-db
-                                image: devopseasylearning/weatherapp-db:${BUILD_NUMBER}
-                                environment:
-                                  MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-                                volumes:
-                                  - db-data:/var/lib/mysql
-                                networks:   
-                                  - weatherapp
-                                restart: always
+	      steps {
+	        script {
+	          withCredentials([
+	            string(credentialsId: 'MYSQL_ROOT_PASSWORD', variable: 'MYSQL_ROOT_PASSWORD'),
+	            string(credentialsId: 'REDIS_PASSWORD', variable: 'REDIS_PASSWORD'),
+	            string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
+                string(credentialsId: 'APIKEY', variable: 'APIKEY')
+	          ]) {
 
-                              redis:
-                                container_name: weatherapp-redis
-                                image: devopseasylearning/weatherapp-redis:${BUILD_NUMBER}
-                                networks:
-                                  - weatherapp
-                                environment:
-                                  REDIS_USER: redis
-                                  REDIS_PASSWORD: ${REDIS_PASSWORD}
-                                volumes:
-                                  - redis-data:/data
-                                restart: always
+	            sh '''
+cat <<EOF > docker-compose.yaml
+  version: '3.5'
+  services:
+    db:
+      container_name: weatherapp-db
+      image: devopseasylearning/weatherapp-db:${BUILD_NUMBER}
+      environment:
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      volumes:
+        - db-data:/var/lib/mysql
+      networks:   
+        - weatherapp
+      restart: always
+  
+    redis:
+      container_name: weatherapp-redis
+      image: devopseasylearning/weatherapp-redis:${BUILD_NUMBER}
+      networks:
+        - weatherapp
+      environment:
+        REDIS_USER: redis
+        REDIS_PASSWORD: ${REDIS_PASSWORD}
+      volumes:
+        - redis-data:/data
+      restart: always
+  
+    weather:
+      container_name: weatherapp-weather
+      image: devopseasylearning/weatherapp-weather:${BUILD_NUMBER}
+      expose:
+        - 5000
+      environment:
+        APIKEY: ${APIKEY}
+      networks:
+        - weatherapp
+      restart: always
+      depends_on:
+        - db
+        - redis  # Weather depends on both db and redis
+    auth:
+      container_name: weatherapp-auth
+      image: devopseasylearning/weatherapp-auth:${BUILD_NUMBER}
+      environment:
+        DB_HOST: db
+        DB_PASSWORD: ${DB_PASSWORD}
+      expose:
+        - 8080
+      networks:
+        - weatherapp
+      restart: always
+      depends_on:
+        - weather  # Auth depends on the weather service
+  
+    ui:
+      container_name: weatherapp-ui
+      image: devopseasylearning/weatherapp-ui:${BUILD_NUMBER}
+      environment:
+       AUTH_HOST: auth
+       AUTH_PORT: 8080
+       WEATHER_HOST: weather
+       WEATHER_PORT: 5000
+       REDIS_USER: redis
+       REDIS_PASSWORD: ${REDIS_PASSWORD}
+      expose:
+        - 3000
+      ports:
+        - 3000:3000
+      networks:
+        - weatherapp
+      restart: always
+      depends_on:
+        - auth  # UI depends on Auth
+  networks:
+    weatherapp:
+  
+  volumes:
+    db-data:
+    redis-data:
+EOF
+	            '''
+	          }
 
-                              weather:
-                                container_name: weatherapp-weather
-                                image: devopseasylearning/weatherapp-weather:${BUILD_NUMBER}
-                                expose:
-                                  - 5000
-                                environment:
-                                  APIKEY: ${APIKEY}
-                                networks:
-                                  - weatherapp
-                                restart: always
-                                depends_on:
-                                  - db
-                                  - redis  # Weather depends on both db and redis
+	        }
 
-                              auth:
-                                container_name: weatherapp-auth
-                                image: devopseasylearning/weatherapp-auth:${BUILD_NUMBER}
-                                environment:
-                                  DB_HOST: db
-                                  DB_PASSWORD: ${DB_PASSWORD}
-                                expose:
-                                  - 8080
-                                networks:
-                                  - weatherapp
-                                restart: always
-                                depends_on:
-                                  - weather
-                        '''
-                    }
-                }
-            }
-        }
+	      }
+
+	    }
 
         stage('Deploy') {
             agent { 
