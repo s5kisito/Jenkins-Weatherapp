@@ -228,7 +228,7 @@ pipeline {
 
 	            sh '''
 cat <<EOF > docker-compose.yaml
-  version: '3.5'
+version: '3.5'
 services:
   db:
     container_name: weatherapp-db
