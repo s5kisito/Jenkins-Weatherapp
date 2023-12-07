@@ -257,7 +257,7 @@ cat <<EOF > docker-compose.yaml
       container_name: weatherapp-weather
       image: kisito2/weatherapp-weather:${BUILD_NUMBER}
       expose:
-        - 5000
+        - 5001
       environment:
         APIKEY: ${APIKEY}
       networks:
@@ -287,7 +287,7 @@ cat <<EOF > docker-compose.yaml
        AUTH_HOST: auth
        AUTH_PORT: 8080
        WEATHER_HOST: weather
-       WEATHER_PORT: 5000
+       WEATHER_PORT: 5001
        REDIS_USER: redis
        REDIS_PASSWORD: ${REDIS_PASSWORD}
       expose:
