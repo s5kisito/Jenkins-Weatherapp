@@ -297,7 +297,9 @@ services:
       - weatherapp
     restart: always
     depends_on:
-      - auth  # UI depends on Auth
+      - auth
+      # UI depends on Auth
+
 
 networks:
   weatherapp:
