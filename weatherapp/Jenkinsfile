@@ -289,7 +289,8 @@ pipeline {
                           WEATHER_HOST: weather
                           WEATHER_PORT: 5001
                           REDIS_USER: redis
-                          REDIS_PASSWORD: ${REDIS_PASSWORD}
+                          REDIS_PASSWORD: "${REDIS_PASSWORD}"
+
                         expose:
                           - 3000
                         ports:
