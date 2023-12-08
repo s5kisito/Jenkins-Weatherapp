@@ -98,225 +98,118 @@ pipeline {
             }
         }
 
-        stage('Build auth') {
-            steps {
-                sh '''
-                    cd $WORKSPACE/weatherapp/auth
-                    docker build -t kisito2/weatherapp-auth:${BUILD_NUMBER} .
-                '''
-            }
-        }
-
-        stage('Push auth') {
-            when { 
-                expression {
-                    env.GIT_BRANCH == 'origin/develop'
-                }
-            }
-            steps {
-                sh '''
-                    docker push kisito2/weatherapp-auth:${BUILD_NUMBER}
-                '''
-            }
-        }
-
-        stage('Build UI') {
-            steps {
-                sh '''
-                    cd $WORKSPACE/weatherapp/UI
-                    docker build -t kisito2/weatherapp-ui:${BUILD_NUMBER} .
-                '''
-            }
-        }
-
-        stage('Push UI') {
-            when { 
-                expression {
-                    env.GIT_BRANCH == 'origin/develop'
-                }
-            }
-            steps {
-                sh '''
-                    docker push kisito2/weatherapp-ui:${BUILD_NUMBER}
-                '''
-            }
-        }
-
-        stage('Build weather') {
-            steps {
-                sh '''
-                    cd $WORKSPACE/weatherapp/weather
-                    docker build -t kisito2/weatherapp-weather:${BUILD_NUMBER} .
-                '''
-            }
-        }
-
-        stage('Push weather') {
-            when { 
-                expression {
-                    env.GIT_BRANCH == 'origin/develop'
-                }
-            }
-            steps {
-                sh '''
-                    docker push kisito2/weatherapp-weather:${BUILD_NUMBER}
-                '''
-            }
-        }
-
-        stage('Build DB') {
-            steps {
-                sh '''
-                    cd $WORKSPACE/weatherapp/DB
-                    docker build -t kisito2/weatherapp-db:${BUILD_NUMBER} .
-                '''
-            }
-        }
-
-        stage('Push DB') {
-            when { 
-                expression {
-                    env.GIT_BRANCH == 'origin/develop'
-                }
-            }
-            steps {
-                sh '''
-                    docker push kisito2/weatherapp-db:${BUILD_NUMBER}
-                '''
-            }
-        }
-
-        stage('Build REDIS') {
-            steps {
-                sh '''
-                    cd $WORKSPACE/weatherapp/REDIS
-                    docker build -t kisito2/weatherapp-redis:${BUILD_NUMBER} .
-                '''
-            }
-        }
-
-        stage('Push REDIS') {
-            when { 
-                expression {
-                    env.GIT_BRANCH == 'origin/develop'
-                }
-            }
-            steps {
-                sh '''
-                    docker push kisito2/weatherapp-redis:${BUILD_NUMBER}
-                '''
-            }
-        }
+        // ... (the rest of your stages)
 
         stage('Generate-compose') {
-    agent { 
-        label "PRODUCTION"
-    }
-    when { 
-        expression {
-            env.GIT_BRANCH == 'origin/develop' 
-        }
-    }
-    steps {
-        script {
-            withCredentials([
-                string(credentialsId: 'MYSQL_ROOT_PASSWORD', variable: 'MYSQL_ROOT_PASSWORD'),
-                string(credentialsId: 'REDIS_PASSWORD', variable: 'REDIS_PASSWORD'),
-                string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
-                string(credentialsId: 'APIKEY', variable: 'APIKEY')
-            ]) {
-                sh '''
-                    cat <<EOF > docker-compose.yaml
-                    version: '3.5'
-                    services:
-                      db:
-                        container_name: weatherapp-db
-                        image: kisito2/weatherapp-db:${BUILD_NUMBER}
-                        environment:
-                          MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-                        volumes:
-                          - db-data:/var/lib/mysql
-                        networks:   
-                          - weatherapp
-                        restart: always
+            agent { 
+                label "PRODUCTION"
+            }
+            when { 
+                expression {
+                    env.GIT_BRANCH == 'origin/develop' 
+                }
+            }
+            steps {
+                script {
+                    withCredentials([
+                        string(credentialsId: 'MYSQL_ROOT_PASSWORD', variable: 'MYSQL_ROOT_PASSWORD'),
+                        string(credentialsId: 'REDIS_PASSWORD', variable: 'REDIS_PASSWORD'),
+                        string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
+                        string(credentialsId: 'APIKEY', variable: 'APIKEY')
+                    ]) {
+                        sh '''
+                            cat <<EOF > docker-compose.yaml
+                            version: '3.5'
+                            services:
+                              db:
+                                container_name: weatherapp-db
+                                image: kisito2/weatherapp-db:"${BUILD_NUMBER}"
+                                environment:
+                                  MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+                                volumes:
+                                  - db-data:/var/lib/mysql
+                                networks:   
+                                  - weatherapp
+                                restart: always
 
-                      redis:
-                        container_name: weatherapp-redis
-                        image: kisito2/weatherapp-redis:${BUILD_NUMBER}
-                        networks:
-                          - weatherapp
-                        environment:
-                          REDIS_USER: redis
-                          REDIS_PASSWORD: '${REDIS_PASSWORD}'
-                        volumes:
-                          - redis-data:/data
-                        restart: always
+                              redis:
+                                container_name: weatherapp-redis
+                                image: kisito2/weatherapp-redis:"${BUILD_NUMBER}"
+                                networks:
+                                  - weatherapp
+                                environment:
+                                  REDIS_USER: redis
+                                  REDIS_PASSWORD: "${REDIS_PASSWORD}"
+                                volumes:
+                                  - redis-data:/data
+                                restart: always
 
-                      weather:
-                        container_name: weatherapp-weather
-                        image: kisito2/weatherapp-weather:${BUILD_NUMBER}
-                        expose:
-                          - 5001
-                        environment:
-                          APIKEY: ${APIKEY}
-                        networks:
-                          - weatherapp
-                        restart: always
-                        depends_on:
-                          - db
-                          - redis  # Weather depends on both db and redis
+                              weather:
+                                container_name: weatherapp-weather
+                                image: kisito2/weatherapp-weather:"${BUILD_NUMBER}"
+                                expose:
+                                  - 5001
+                                environment:
+                                  APIKEY: "${APIKEY}"
+                                networks:
+                                  - weatherapp
+                                restart: always
+                                depends_on:
+                                  - db
+                                  - redis  # Weather depends on both db and redis
 
-                      auth:
-                        container_name: weatherapp-auth
-                        image: kisito2/weatherapp-auth:${BUILD_NUMBER}
-                        environment:
-                          DB_HOST: db
-                          DB_PASSWORD: ${DB_PASSWORD}
-                        expose:
-                          - 8080
-                        networks:
-                          - weatherapp
-                        restart: always
-                        depends_on:
-                          - weather  # Auth depends on the weather service
+                              auth:
+                                container_name: weatherapp-auth
+                                image: kisito2/weatherapp-auth:"${BUILD_NUMBER}"
+                                environment:
+                                  DB_HOST: db
+                                  DB_PASSWORD: "${DB_PASSWORD}"
+                                expose:
+                                  - 8080
+                                networks:
+                                  - weatherapp
+                                restart: always
+                                depends_on:
+                                  - weather  # Auth depends on the weather service
 
-                      ui:
-                        container_name: weatherapp-ui
-                        image: kisito2/weatherapp-ui:${BUILD_NUMBER}
-                        environment:
-                          AUTH_HOST: auth
-                          AUTH_PORT: 8080
-                          WEATHER_HOST: weather
-                          WEATHER_PORT: 5001
-                          REDIS_USER: redis
-                          REDIS_PASSWORD: "${REDIS_PASSWORD}"
+                              ui:
+                                container_name: weatherapp-ui
+                                image: kisito2/weatherapp-ui:"${BUILD_NUMBER}"
+                                environment:
+                                  AUTH_HOST: auth
+                                  AUTH_PORT: 8080
+                                  WEATHER_HOST: weather
+                                  WEATHER_PORT: 5001
+                                  REDIS_USER: redis
+                                  REDIS_PASSWORD: "${REDIS_PASSWORD}"
 
-                        expose:
-                          - 3000
-                        ports:
-                          - 3000:3000
-                        networks:
-                          - weatherapp
-                        restart: always
-                        depends_on:
-                          - auth  # UI depends on Auth
+                                expose:
+                                  - 3000
+                                ports:
+                                  - 3000:3000
+                                networks:
+                                  - weatherapp
+                                restart: always
+                                depends_on:
+                                  - auth  # UI depends on Auth
 
-                    networks:
-                      weatherapp:
+                            networks:
+                              weatherapp:
 
-                    volumes:
-                      db-data:
-                      redis-data:
-                    EOF
-                    cat docker-compose.yaml  # Print the generated YAML
-                '''
+                            volumes:
+                              db-data:
+                              redis-data:
+                            EOF
+                            cat docker-compose.yaml  # Print the generated YAML
+                        '''
+                    }
+                }
             }
         }
-    }
-}
 
-
-        stage('Deploy') {
+        // ... (the rest of your stages)
+        
+                stage('Deploy') {
             agent { 
                 label "PRODUCTION"
             }
@@ -368,3 +261,10 @@ pipeline {
         }
     }
 }
+
+
+
+
+
+
+
