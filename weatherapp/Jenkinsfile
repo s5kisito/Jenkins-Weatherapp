@@ -307,8 +307,9 @@ pipeline {
                     volumes:
                       db-data:
                       redis-data:
+                      
                     EOF
-                    cat docker-compose.yaml  # Print the generated YAML
+                    
                 '''
             }
         }
