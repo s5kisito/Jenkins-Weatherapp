@@ -225,7 +225,8 @@ pipeline {
                 string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
                 string(credentialsId: 'APIKEY', variable: 'APIKEY')
             ]) {
-                def composeContent = """
+                sh '''
+cat <<EOF > docker-compose.yaml
 version: '3.5'
 services:
   db:
@@ -297,9 +298,7 @@ services:
       - weatherapp
     restart: always
     depends_on:
-      - auth
-      # UI depends on Auth
-
+      - auth  # UI depends on Auth
 
 networks:
   weatherapp:
@@ -307,8 +306,9 @@ networks:
 volumes:
   db-data:
   redis-data:
-"""
-                writeFile file: 'docker-compose.yaml', text: composeContent
+EOF
+cat docker-compose.yaml  # Print the generated YAML
+'''
             }
         }
     }
