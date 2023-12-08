@@ -247,7 +247,7 @@ pipeline {
                           - weatherapp
                         environment:
                           REDIS_USER: redis
-                          REDIS_PASSWORD: ${REDIS_PASSWORD}
+                          REDIS_PASSWORD: '${REDIS_PASSWORD}'
                         volumes:
                           - redis-data:/data
                         restart: always
