@@ -308,8 +308,8 @@ networks:
 volumes:
   db-data:
   redis-data:
-EOF
-
+  
+EOF_YAML
 cat docker-compose.yaml
 '''
             }
