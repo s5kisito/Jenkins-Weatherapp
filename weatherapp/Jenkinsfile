@@ -323,23 +323,23 @@ cat docker-compose.yaml
 
 
 
-    // stage('Deploy') {
-    //         agent { 
-    //             label "PRODUCTION"
-    //         }
-    //         when { 
-    //             expression {
-    //                 env.GIT_BRANCH == 'origin/develop'
-    //             }
-    //         }
-    //         steps {
-    //             sh '''
-    //                 docker-compose down --remove-orphans || true
-    //                 docker-compose up -d 
-    //                 docker-compose ps 
-    //             '''
-    //         }
-    //     }
+    stage('Deploy') {
+            agent { 
+                label "PRODUCTION"
+            }
+            when { 
+                expression {
+                    env.GIT_BRANCH == 'origin/develop'
+                }
+            }
+            steps {
+                sh '''
+                    docker-compose down --remove-orphans || true
+                    docker-compose up -d 
+                    docker-compose ps 
+                '''
+            }
+        }
 
     //     stage('checking deployment') {
     //         agent { 
