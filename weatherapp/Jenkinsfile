@@ -305,7 +305,7 @@ networks:
   weatherapp:
 
 volumes:
-  db_data:
+  db-data:
   redis_data:
 EOF
 '''
