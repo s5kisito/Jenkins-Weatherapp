@@ -232,7 +232,7 @@ version: '3.5'
 services:
   db:
     container_name: weatherapp-db
-    image: kisito2/weatherapp-db:"${BUILD_NUMBER}"
+    image: kisito2/weatherapp-db: ${BUILD_NUMBER}
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
     volumes:
@@ -243,23 +243,23 @@ services:
 
   redis:
     container_name: weatherapp-redis
-    image: kisito2/weatherapp-redis:"${BUILD_NUMBER}"
+    image: kisito2/weatherapp-redis: ${BUILD_NUMBER}
     networks:
       - weatherapp
     environment:
       REDIS_USER: redis
-      REDIS_PASSWORD: "${REDIS_PASSWORD}"
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     volumes:
       - redis-data:/data
     restart: always
 
   weather:
     container_name: weatherapp-weather
-    image: kisito2/weatherapp-weather:"${BUILD_NUMBER}"
+    image: kisito2/weatherapp-weather: ${BUILD_NUMBER}
     expose:
       - 5001
     environment:
-      APIKEY: "${APIKEY}"
+      APIKEY: ${APIKEY}
     networks:
       - weatherapp
     restart: always
@@ -272,7 +272,7 @@ services:
     image: kisito2/weatherapp-auth:"${BUILD_NUMBER}"
     environment:
       DB_HOST: db
-      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_PASSWORD: ${DB_PASSWORD}
     expose:
       - 8080
     networks:
@@ -283,14 +283,14 @@ services:
 
   ui:
     container_name: weatherapp-ui
-    image: kisito2/weatherapp-ui:"${BUILD_NUMBER}"
+    image: kisito2/weatherapp-ui: ${BUILD_NUMBER}
     environment:
       AUTH_HOST: auth
       AUTH_PORT: 8080
       WEATHER_HOST: weather
       WEATHER_PORT: 5001
       REDIS_USER: redis
-      REDIS_PASSWORD: "${REDIS_PASSWORD}"
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
 
     expose:
       - 3000
