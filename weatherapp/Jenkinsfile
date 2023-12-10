@@ -227,7 +227,7 @@ pipeline {
                 string(credentialsId: 'APIKEY', variable: 'APIKEY')
             ]) {
                 sh '''
-cat <<EOF > docker-compose.yaml
+cat <<EOF_YAML > docker-compose.yaml
 version: '3.5'
 services:
   db:
@@ -323,55 +323,55 @@ cat docker-compose.yaml
 
 
 
-    stage('Deploy') {
-            agent { 
-                label "PRODUCTION"
-            }
-            when { 
-                expression {
-                    env.GIT_BRANCH == 'origin/develop'
-                }
-            }
-            steps {
-                sh '''
-                    docker-compose down --remove-orphans || true
-                    docker-compose up -d 
-                    docker-compose ps 
-                '''
-            }
-        }
+    // stage('Deploy') {
+    //         agent { 
+    //             label "PRODUCTION"
+    //         }
+    //         when { 
+    //             expression {
+    //                 env.GIT_BRANCH == 'origin/develop'
+    //             }
+    //         }
+    //         steps {
+    //             sh '''
+    //                 docker-compose down --remove-orphans || true
+    //                 docker-compose up -d 
+    //                 docker-compose ps 
+    //             '''
+    //         }
+    //     }
 
-        stage('checking deployment') {
-            agent { 
-                label "PRODUCTION"
-            }
-            when { 
-                expression {
-                    env.GIT_BRANCH == 'origin/develop'
-                }
-            }
-            steps {
-                sh '''
-                    bash weatherapp/check.sh
-                '''
-            }
-        }
+    //     stage('checking deployment') {
+    //         agent { 
+    //             label "PRODUCTION"
+    //         }
+    //         when { 
+    //             expression {
+    //                 env.GIT_BRANCH == 'origin/develop'
+    //             }
+    //         }
+    //         steps {
+    //             sh '''
+    //                 bash weatherapp/check.sh
+    //             '''
+    //         }
+    //     }
 
-        stage('checking website') {
-            agent { 
-                label "PRODUCTION"
-            }
-            when { 
-                expression {
-                    env.GIT_BRANCH == 'origin/develop'
-                }
-            }
-            steps {
-                sh '''
-                    sleep 10
-                    bash weatherapp/check-login.sh
-                '''
-            }
-        }
+    //     stage('checking website') {
+    //         agent { 
+    //             label "PRODUCTION"
+    //         }
+    //         when { 
+    //             expression {
+    //                 env.GIT_BRANCH == 'origin/develop'
+    //             }
+    //         }
+    //         steps {
+    //             sh '''
+    //                 sleep 10
+    //                 bash weatherapp/check-login.sh
+    //             '''
+    //         }
+    //     }
     }
 }
