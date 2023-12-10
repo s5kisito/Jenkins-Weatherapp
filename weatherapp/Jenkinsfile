@@ -208,6 +208,7 @@ pipeline {
             }
         }
 
+        
         stage('Generate-compose') {
     agent {
         label "PRODUCTION"
@@ -308,15 +309,21 @@ volumes:
   db-data:
   redis-data:
 EOF
+
+cat docker-compose.yaml
 '''
             }
         }
     }
 }
+    
+        
+    
 
 
 
-        stage('Deploy') {
+
+    stage('Deploy') {
             agent { 
                 label "PRODUCTION"
             }
