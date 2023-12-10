@@ -269,7 +269,7 @@ services:
 
   auth:
     container_name: weatherapp-auth
-    image: kisito2/weatherapp-auth:"${BUILD_NUMBER}"
+    image: kisito2/weatherapp-auth: ${BUILD_NUMBER}
     environment:
       DB_HOST: db
       DB_PASSWORD: ${DB_PASSWORD}
