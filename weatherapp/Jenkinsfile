@@ -306,7 +306,7 @@ networks:
 
 volumes:
   db-data:
-  redis_data:
+  redis-data:
 EOF
 '''
             }
