@@ -232,9 +232,9 @@ version: '3.5'
 services:
   db:
     container_name: weatherapp-db
-    image: kisito2/weatherapp-db:${WEATHERAPP_BUILD_NUMBER}
+    image: kisito2/weatherapp-db:\${WEATHERAPP_BUILD_NUMBER}
     environment:
-      MYSQL_ROOT_PASSWORD: "${WEATHERAPP_MYSQL_ROOT_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: "\${WEATHERAPP_MYSQL_ROOT_PASSWORD}"
     volumes:
       - db-data:/var/lib/mysql
     networks:   
@@ -243,55 +243,54 @@ services:
 
   redis:
     container_name: weatherapp-redis
-    image: kisito2/weatherapp-redis:${WEATHERAPP_BUILD_NUMBER}
+    image: kisito2/weatherapp-redis:\${WEATHERAPP_BUILD_NUMBER}
     networks:
       - weatherapp
     environment:
       REDIS_USER: redis
-      REDIS_PASSWORD: ${WEATHERAPP_REDIS_PASSWORD}
+      REDIS_PASSWORD: "\${WEATHERAPP_REDIS_PASSWORD}"
     volumes:
       - redis-data:/data
     restart: always
 
   weather:
     container_name: weatherapp-weather
-    image: kisito2/weatherapp-weather:${WEATHERAPP_BUILD_NUMBER}
+    image: kisito2/weatherapp-weather:\${WEATHERAPP_BUILD_NUMBER}
     expose:
       - 5001
     environment:
-      APIKEY: ${WEATHERAPP_APIKEY}
+      APIKEY: "\${WEATHERAPP_APIKEY}"
     networks:
       - weatherapp
     restart: always
     depends_on:
       - db
-      - redis  # Weather depends on both db and redis
+      - redis
 
   auth:
     container_name: weatherapp-auth
-    image: kisito2/weatherapp-auth:${WEATHERAPP_BUILD_NUMBER}
+    image: kisito2/weatherapp-auth:\${WEATHERAPP_BUILD_NUMBER}
     environment:
       DB_HOST: db
-      DB_PASSWORD: ${WEATHERAPP_DB_PASSWORD}
+      DB_PASSWORD: "\${WEATHERAPP_DB_PASSWORD}"
     expose:
       - 8080
     networks:
       - weatherapp
     restart: always
     depends_on:
-      - weather  # Auth depends on the weather service
+      - weather
 
   ui:
     container_name: weatherapp-ui
-    image: kisito2/weatherapp-ui:${WEATHERAPP_BUILD_NUMBER}
+    image: kisito2/weatherapp-ui:\${WEATHERAPP_BUILD_NUMBER}
     environment:
       AUTH_HOST: auth
       AUTH_PORT: 8080
       WEATHER_HOST: weather
       WEATHER_PORT: 5001
       REDIS_USER: redis
-      REDIS_PASSWORD: ${WEATHERAPP_REDIS_PASSWORD}
-
+      REDIS_PASSWORD: "\${WEATHERAPP_REDIS_PASSWORD}"
     expose:
       - 3000
     ports:
@@ -300,7 +299,7 @@ services:
       - weatherapp
     restart: always
     depends_on:
-      - auth  # UI depends on Auth
+      - auth
 
 networks:
   weatherapp:
@@ -308,9 +307,8 @@ networks:
 volumes:
   db-data:
   redis-data:
-  
 EOF_YAML
-cat docker-compose.yaml
+
 '''
             }
         }
