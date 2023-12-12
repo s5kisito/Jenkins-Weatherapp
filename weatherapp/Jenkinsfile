@@ -244,6 +244,7 @@ services:
   db:
     container_name: weatherapp-db
     image: kisito2/weatherapp-db:${BUILD_NUMBER}
+    
     environment:
       MYSQL_ROOT_PASSWORD: ${WEATHERAPP_MYSQL_ROOT_PASSWORD}
     volumes:
@@ -254,7 +255,7 @@ services:
 
   redis:
     container_name: weatherapp-redis
-    image: kisito2/weatherapp-redis:{BUILD_NUMBER}
+    image: kisito2/weatherapp-redis:${BUILD_NUMBER}
     networks:
       - weatherapp
     environment:
