@@ -315,6 +315,8 @@ services:
 
 networks:
   weatherapp:
+    driver: local
+
 
 volumes:
   db-data:
