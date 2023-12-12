@@ -243,7 +243,7 @@ version: '3.5'
 services:
   db:
     container_name: weatherapp-db
-    image: kisito2/weatherapp-db:${WEATHERAPP_BUILD_NUMBER}
+    image: kisito2/weatherapp-db:${BUILD_NUMBER}
     environment:
       MYSQL_ROOT_PASSWORD: ${WEATHERAPP_MYSQL_ROOT_PASSWORD}
     volumes:
@@ -254,7 +254,7 @@ services:
 
   redis:
     container_name: weatherapp-redis
-    image: kisito2/weatherapp-redis:{WEATHERAPP_BUILD_NUMBER}
+    image: kisito2/weatherapp-redis:{BUILD_NUMBER}
     networks:
       - weatherapp
     environment:
@@ -266,7 +266,7 @@ services:
 
   weather:
     container_name: weatherapp-weather
-    image: kisito2/weatherapp-weather:${WEATHERAPP_BUILD_NUMBER}
+    image: kisito2/weatherapp-weather:${BUILD_NUMBER}
     expose:
       - 5001
     environment:
@@ -280,7 +280,7 @@ services:
 
   auth:
     container_name: weatherapp-auth
-    image: kisito2/weatherapp-auth:${WEATHERAPP_BUILD_NUMBER}
+    image: kisito2/weatherapp-auth:${BUILD_NUMBER}
     environment:
       DB_HOST: db
       DB_PASSWORD: ${WEATHERAPP_DB_PASSWORD}
@@ -294,7 +294,7 @@ services:
 
   ui:
     container_name: weatherapp-ui
-    image: kisito2/weatherapp-ui:${WEATHERAPP_BUILD_NUMBER}
+    image: kisito2/weatherapp-ui:${BUILD_NUMBER}
     environment:
       AUTH_HOST: auth
       AUTH_PORT: 8080
