@@ -1,0 +1,10 @@
+ubuntu@ip-172-31-47-73:~$ which docker
+/usr/bin/docker
+ubuntu@ip-172-31-47-73:~$ docker --version
+Docker version 24.0.7, build afdd53b
+ubuntu@ip-172-31-47-73:~$ which docker-compose
+/usr/local/bin/docker-compose
+ubuntu@ip-172-31-47-73:~$ docker-compose --version
+docker-compose version 1.29.2, build 5becea4c
+ubuntu@ip-172-31-47-73:~$ 
+
