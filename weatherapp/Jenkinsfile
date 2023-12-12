@@ -207,6 +207,17 @@ pipeline {
                 '''
             }
         }
+        
+        stage('Check Docker Compose Version') {
+            agent {
+              label "PRODUCTION"
+            }
+            steps {
+                script {
+                    sh 'docker-compose --version'
+                }
+            }
+        }
 
         
         stage('Generate-compose') {
