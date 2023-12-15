@@ -233,11 +233,6 @@ pipeline {
     agent {
         label "PRODUCTION"
     }
-    when {
-        expression {
-            env.GIT_BRANCH == 'origin/develop'
-        }
-    }
     steps {
         script {
             notifyUpgrade(currentBuild.currentResult, "WARNING")
