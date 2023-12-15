@@ -417,7 +417,9 @@ cat docker-compose.yaml
                 '''
             }
         }
-    
+    }
+            
+ 
 post {
     always {
       script {
@@ -426,8 +428,9 @@ post {
     }
     
   }
+}
 
-}    
+   
 
 def notifyUpgrade(String buildResult, String whereAt) {
   if (Please_leave_this_section_as_it_is == 'origin/develop') {
@@ -460,5 +463,5 @@ def notifyUpgrade(String buildResult, String whereAt) {
   }
 
 }
-}
+
 
