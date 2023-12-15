@@ -1,0 +1,4 @@
+Jenkinsfile:
+  invalid reference format: related to images , bracket, braces, and $ for value whenn we 
+  set ENV.
+  
