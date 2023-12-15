@@ -29,82 +29,82 @@ pipeline {
                 }
             }
         }
-        // stage('Test auth') {
-        //     agent {
-        //         docker {
-        //             image 'golang:alpine'
-        //             args '-u root:root'
-        //         }
-        //     }
-        //     steps {
-        //         sh '''
-        //             id
-        //             cd weatherapp/auth/src/main
-        //             go build 
-        //             cd -
-        //             ls -la
-        //         '''
-        //     }
-        // }
+        stage('Test auth') {
+            agent {
+                docker {
+                    image 'golang:alpine'
+                    args '-u root:root'
+                }
+            }
+            steps {
+                sh '''
+                    id
+                    cd weatherapp/auth/src/main
+                    go build 
+                    cd -
+                    ls -la
+                '''
+            }
+        }
 
-        // stage('Test UI') {
-        //     agent {
-        //         docker {
-        //             image 'node:17'
-        //             args '-u root:root'
-        //         }
-        //     }
-        //     steps {
-        //         sh '''
-        //             id
-        //             cd weatherapp/UI
-        //             npm run
-        //             ls -la
-        //         '''
-        //     }
-        // }
+        stage('Test UI') {
+            agent {
+                docker {
+                    image 'node:17'
+                    args '-u root:root'
+                }
+            }
+            steps {
+                sh '''
+                    id
+                    cd weatherapp/UI
+                    npm run
+                    ls -la
+                '''
+            }
+        }
 
-        // stage('Test weather') {
-        //     agent {
-        //         docker {
-        //             image 'python:3.8-slim-buster'
-        //             args '-u root:root'
-        //         }
-        //     }
-        //     steps {
-        //         sh '''
-        //             id
-        //             cd weatherapp/weather
-        //             pip3 install -r requirements.txt
-        //             ls -la
-        //         '''
-        //     }
-        // }
+        stage('Test weather') {
+            agent {
+                docker {
+                    image 'python:3.8-slim-buster'
+                    args '-u root:root'
+                }
+            }
+            steps {
+                sh '''
+                    id
+                    cd weatherapp/weather
+                    pip3 install -r requirements.txt
+                    ls -la
+                '''
+            }
+        }
 
-        // stage('SonarQube analysis') {
-        //     agent {
-        //         docker {
-        //             image 'sonarsource/sonar-scanner-cli:4.7.0'
-        //         }
-        //     }
-        //     environment {
-        //         CI = 'true'
-        //         scannerHome = '/opt/sonar-scanner'
-        //     }
-        //     steps {
-        //         withSonarQubeEnv('Sonar') {
-        //             sh "${scannerHome}/bin/sonar-scanner"
-        //         }
-        //     }
-        // }
+        stage('SonarQube analysis') {
+            agent {
+                docker {
+                    image 'sonarsource/sonar-scanner-cli:4.7.0'
+                }
+            }
+            environment {
+                CI = 'true'
+                scannerHome = '/opt/sonar-scanner'
+            }
+            steps {
+                withSonarQubeEnv('Sonar') {
+                    sh "${scannerHome}/bin/sonar-scanner"
+                }
+            }
+        }
 
-        // stage("Quality Gate") {
-        //     steps {
-        //         timeout(time: 1, unit: 'HOURS') {
-        //             waitForQualityGate(abortPipeline: true)
-        //         }
-        //     }
-        // }
+        stage("Quality Gate") {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate(abortPipeline: true)
+                }
+            }
+        }
 
         stage('Login to Docker Hub') {  
             steps {
