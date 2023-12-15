@@ -434,9 +434,9 @@ post {
 
 def notifyUpgrade(String buildResult, String whereAt) {
   if (Please_leave_this_section_as_it_is == 'origin/develop') {
-    channel = 'development-alerts'
+    channel = 'jenkins-project-'
   } else {
-    channel = 'development-alerts'
+    channel = 'jenkins-project-'
   }
   if (buildResult == "SUCCESS") {
     switch(whereAt) {
