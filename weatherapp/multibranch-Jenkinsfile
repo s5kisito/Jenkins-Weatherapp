@@ -1,5 +1,5 @@
 pipeline {
-    agent { 
+    agent {
         label "QUALITY-ASSURANCE"
     }
 
@@ -8,7 +8,6 @@ pipeline {
     }
 
     stages {
-
         stage('Test auth') {
             agent {
                 docker {
@@ -17,13 +16,16 @@ pipeline {
                 }
             }
             steps {
-                sh '''
-                    id
-                    cd weatherapp/auth/src/main
-                    go build 
-                    cd -
-                    ls -la
-                '''
+                script {
+                    // Wrap the commands in a script block
+                    sh '''
+                        id
+                        cd weatherapp/auth/src/main
+                        go build
+                        cd -
+                        ls -la
+                    '''
+                }
             }
         }
 
@@ -35,12 +37,15 @@ pipeline {
                 }
             }
             steps {
-                sh '''
-                    id
-                    cd weatherapp/UI
-                    npm run
-                    ls -la
-                '''
+                script {
+                    sh '''
+                        id
+                        cd weatherapp/UI
+                        npm install
+                        npm run
+                        ls -la
+                    '''
+                }
             }
         }
 
@@ -52,12 +57,14 @@ pipeline {
                 }
             }
             steps {
-                sh '''
-                    id
-                    cd weatherapp/weather
-                    pip3 install -r requirements.txt
-                    ls -la
-                '''
+                script {
+                    sh '''
+                        id
+                        cd weatherapp/weather
+                        pip3 install -r requirements.txt
+                        ls -la
+                    '''
+                }
             }
         }
 
@@ -72,21 +79,15 @@ pipeline {
                 scannerHome = '/opt/sonar-scanner'
             }
             steps {
-                withSonarQubeEnv('Sonar') {
-                    sh "${scannerHome}/bin/sonar-scanner"
+                script {
+                    withSonarQubeEnv('Sonar') {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
                 }
             }
         }
 
-        // stage("Quality Gate") {
-        //     steps {
-        //         timeout(time: 1, unit: 'HOURS') {
-        //             waitForQualityGate(abortPipeline: true)
-        //         }
-        //     }
-        // }
-
-        stage('Login to Docker Hub') {  
+        stage('Login to Docker Hub') {
             steps {
                 script {
                     // Define your Docker Hub username and access token
@@ -108,8 +109,7 @@ pipeline {
             }
         }
 
-
-        stage('Build UI') {
+         stage('Build UI') {
             steps {
                 sh '''
                     cd $WORKSPACE/weatherapp/UI
@@ -127,6 +127,7 @@ pipeline {
             }
         }
 
+
         stage('Build DB') {
             steps {
                 sh '''
@@ -136,6 +137,7 @@ pipeline {
             }
         }
 
+        
         stage('Build REDIS') {
             steps {
                 sh '''
@@ -145,32 +147,28 @@ pipeline {
             }
         }
 
-          
- 
-post {
 
-   success {
-      slackSend (channel: 'session5-november-2022', color: 'good', message: "The Weatherapp_multibranch_pipeline SUCCESSFUL:  Branch name  <<${env.BRANCH_NAME}>>  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-    }
+         stage('Post-build') {
+            post {
+                success {
+                    slackSend (channel: 'session5-november-2022', color: 'good', message: "The Weatherapp_multibranch_pipeline SUCCESSFUL: Branch name <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+                }
 
+                unstable {
+                    slackSend (channel: 'session5-november-2022', color: 'warning', message: "The Weatherapp_multibranch_pipeline UNSTABLE: Branch name <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+                }
 
-    unstable {
-      slackSend (channel: 'session5-november-2022', color: 'warning', message: "The Weatherapp_multibranch_pipeline UNSTABLE:  Branch name  <<${env.BRANCH_NAME}>>  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-    }
+                failure {
+                    slackSend (channel: 'session5-november-2022', color: '#FF0000', message: "The Weatherapp_multibranch_pipeline FAILURE: Branch name <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+                }
 
-    failure {
-      slackSend (channel: 'session5-november-2022', color: '#FF0000', message: "The Weatherapp_multibranch_pipeline FAILURE:  Branch name  <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-    }
-   
-    cleanup {
-      deleteDir()
+                cleanup {
+                    deleteDir()
+                }
+            }
+        }
     }
 }
-
-    }
-
-}
-
 
    
 
