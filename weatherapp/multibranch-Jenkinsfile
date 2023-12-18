@@ -17,7 +17,6 @@ pipeline {
             }
             steps {
                 script {
-                    // Wrap the commands in a script block
                     sh '''
                         id
                         cd weatherapp/auth/src/main
@@ -102,61 +101,77 @@ pipeline {
 
         stage('Build auth') {
             steps {
-                sh '''
-                    cd $WORKSPACE/weatherapp/auth
-                    docker build -t kisito2/weatherapp-auth:${BUILD_NUMBER} .
-                '''
+                script {
+                    sh '''
+                        cd $WORKSPACE/weatherapp/auth
+                        docker build -t kisito2/weatherapp-auth:${BUILD_NUMBER} .
+                    '''
+                }
             }
         }
 
-         stage('Build UI') {
+        stage('Build UI') {
             steps {
-                sh '''
-                    cd $WORKSPACE/weatherapp/UI
-                    docker build -t kisito2/weatherapp-ui:${BUILD_NUMBER} .
-                '''
+                script {
+                    sh '''
+                        cd $WORKSPACE/weatherapp/UI
+                        docker build -t kisito2/weatherapp-ui:${BUILD_NUMBER} .
+                    '''
+                }
             }
         }
 
         stage('Build weather') {
             steps {
-                sh '''
-                    cd $WORKSPACE/weatherapp/weather
-                    docker build -t kisito2/weatherapp-weather:${BUILD_NUMBER} .
-                '''
+                script {
+                    sh '''
+                        cd $WORKSPACE/weatherapp/weather
+                        docker build -t kisito2/weatherapp-weather:${BUILD_NUMBER} .
+                    '''
+                }
             }
         }
 
         stage('Build DB') {
             steps {
-                sh '''
-                    cd $WORKSPACE/weatherapp/DB
-                    docker build -t kisito2/weatherapp-db:${BUILD_NUMBER} .
-                '''
+                script {
+                    sh '''
+                        cd $WORKSPACE/weatherapp/DB
+                        docker build -t kisito2/weatherapp-db:${BUILD_NUMBER} .
+                    '''
+                }
             }
         }
 
         stage('Build REDIS') {
             steps {
-                sh '''
-                    cd $WORKSPACE/weatherapp/REDIS
-                    docker build -t kisito2/weatherapp-redis:${BUILD_NUMBER} .
-                '''
+                script {
+                    sh '''
+                        cd $WORKSPACE/weatherapp/REDIS
+                        docker build -t kisito2/weatherapp-redis:${BUILD_NUMBER} .
+                    '''
+                }
             }
         }
 
-         stage('Post-build') {
+        stage('Post-build') {
             post {
                 success {
-                    slackSend (channel: 'session5-november-2022', color: 'good', message: "The Weatherapp_multibranch_pipeline SUCCESSFUL: Branch name <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+                    script {
+                        slackSend (channel: 'session5-november-2022', color: 'good', message: "The Weatherapp_multibranch_pipeline SUCCESSFUL: Branch name <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+                    }
                 }
 
                 unstable {
-                    slackSend (channel: 'session5-november-2022', color: 'warning', message: "The Weatherapp_multibranch_pipeline UNSTABLE: Branch name <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+                    script {
+                        slackSend (channel: 'session5-november-2022', color: 'warning', message: "The Weatherapp_multibranch_pipeline UNSTABLE: Branch name <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+                    }
                 }
 
                 failure {
-                    slackSend (channel: 'session5-november-2022', color: '#FF0000', message: "The Weatherapp_multibranch_pipeline FAILURE: Branch name <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+                    script {
+                        slackSend (channel: 'session5-november-2022', color: '#FF0000', message: "The Weatherapp_multibranch_pipeline FAILURE: Branch name <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+                    }
                 }
 
                 cleanup {
@@ -166,6 +181,3 @@ pipeline {
         }
     }
 }
-
-   
-
