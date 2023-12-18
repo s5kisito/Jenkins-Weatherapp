@@ -127,7 +127,6 @@ pipeline {
             }
         }
 
-
         stage('Build DB') {
             steps {
                 sh '''
@@ -137,7 +136,6 @@ pipeline {
             }
         }
 
-        
         stage('Build REDIS') {
             steps {
                 sh '''
@@ -146,7 +144,6 @@ pipeline {
                 '''
             }
         }
-
 
          stage('Post-build') {
             post {
