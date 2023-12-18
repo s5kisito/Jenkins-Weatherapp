@@ -1,0 +1,176 @@
+pipeline {
+    agent { 
+        label "QUALITY-ASSURANCE"
+    }
+
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '5', numToKeepStr: '5'))
+    }
+
+    stages {
+
+        stage('Test auth') {
+            agent {
+                docker {
+                    image 'golang:alpine'
+                    args '-u root:root'
+                }
+            }
+            steps {
+                sh '''
+                    id
+                    cd weatherapp/auth/src/main
+                    go build 
+                    cd -
+                    ls -la
+                '''
+            }
+        }
+
+        stage('Test UI') {
+            agent {
+                docker {
+                    image 'node:17'
+                    args '-u root:root'
+                }
+            }
+            steps {
+                sh '''
+                    id
+                    cd weatherapp/UI
+                    npm run
+                    ls -la
+                '''
+            }
+        }
+
+        stage('Test weather') {
+            agent {
+                docker {
+                    image 'python:3.8-slim-buster'
+                    args '-u root:root'
+                }
+            }
+            steps {
+                sh '''
+                    id
+                    cd weatherapp/weather
+                    pip3 install -r requirements.txt
+                    ls -la
+                '''
+            }
+        }
+
+        stage('SonarQube analysis') {
+            agent {
+                docker {
+                    image 'sonarsource/sonar-scanner-cli:4.7.0'
+                }
+            }
+            environment {
+                CI = 'true'
+                scannerHome = '/opt/sonar-scanner'
+            }
+            steps {
+                withSonarQubeEnv('Sonar') {
+                    sh "${scannerHome}/bin/sonar-scanner"
+                }
+            }
+        }
+
+        // stage("Quality Gate") {
+        //     steps {
+        //         timeout(time: 1, unit: 'HOURS') {
+        //             waitForQualityGate(abortPipeline: true)
+        //         }
+        //     }
+        // }
+
+        stage('Login to Docker Hub') {  
+            steps {
+                script {
+                    // Define your Docker Hub username and access token
+                    def dockerHubUser = 'kisito2'
+                    def dockerHubAccessToken = 'dckr_pat_BsJ_HqhkoOw66SYpHsK7q5EcCBw'
+
+                    // Docker login command with access token
+                    sh "echo ${dockerHubAccessToken} | docker login -u ${dockerHubUser} --password-stdin"
+                }
+            }
+        }
+
+        stage('Build auth') {
+            steps {
+                sh '''
+                    cd $WORKSPACE/weatherapp/auth
+                    docker build -t kisito2/weatherapp-auth:${BUILD_NUMBER} .
+                '''
+            }
+        }
+
+
+        stage('Build UI') {
+            steps {
+                sh '''
+                    cd $WORKSPACE/weatherapp/UI
+                    docker build -t kisito2/weatherapp-ui:${BUILD_NUMBER} .
+                '''
+            }
+        }
+
+        stage('Build weather') {
+            steps {
+                sh '''
+                    cd $WORKSPACE/weatherapp/weather
+                    docker build -t kisito2/weatherapp-weather:${BUILD_NUMBER} .
+                '''
+            }
+        }
+
+        stage('Build DB') {
+            steps {
+                sh '''
+                    cd $WORKSPACE/weatherapp/DB
+                    docker build -t kisito2/weatherapp-db:${BUILD_NUMBER} .
+                '''
+            }
+        }
+
+        stage('Build REDIS') {
+            steps {
+                sh '''
+                    cd $WORKSPACE/weatherapp/REDIS
+                    docker build -t kisito2/weatherapp-redis:${BUILD_NUMBER} .
+                '''
+            }
+        }
+
+          
+ 
+post {
+
+   success {
+      slackSend (channel: 'session5-november-2022', color: 'good', message: "The Weatherapp_multibranch_pipeline SUCCESSFUL:  Branch name  <<${env.BRANCH_NAME}>>  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+    }
+
+
+    unstable {
+      slackSend (channel: 'session5-november-2022', color: 'warning', message: "The Weatherapp_multibranch_pipeline UNSTABLE:  Branch name  <<${env.BRANCH_NAME}>>  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+    }
+
+    failure {
+      slackSend (channel: 'session5-november-2022', color: '#FF0000', message: "The Weatherapp_multibranch_pipeline FAILURE:  Branch name  <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+    }
+   
+    cleanup {
+      deleteDir()
+    }
+}
+
+    }
+
+}
+
+
+   
+
