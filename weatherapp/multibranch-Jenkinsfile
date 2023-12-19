@@ -16,15 +16,13 @@ pipeline {
                 }
             }
             steps {
-                script {
-                    sh '''
-                        id
-                        cd weatherapp/auth/src/main
-                        go build
-                        cd -
-                        ls -la
-                    '''
-                }
+                sh '''
+                    id
+                    cd weatherapp/auth/src/main
+                    go build 
+                    cd -
+                    ls -la
+                '''
             }
         }
 
@@ -36,15 +34,10 @@ pipeline {
                 }
             }
             steps {
-                script {
-                    sh '''
-                        id
-                        cd weatherapp/UI
-                        npm install
-                        npm run
-                        ls -la
-                    '''
-                }
+                sh '''
+                    cd weatherapp/UI
+                    npm run
+                '''
             }
         }
 
@@ -56,14 +49,10 @@ pipeline {
                 }
             }
             steps {
-                script {
-                    sh '''
-                        id
-                        cd weatherapp/weather
-                        pip3 install -r requirements.txt
-                        ls -la
-                    '''
-                }
+                sh '''
+                    cd weatherapp/weather
+                    pip3 install -r requirements.txt
+                '''
             }
         }
 
@@ -71,6 +60,7 @@ pipeline {
             agent {
                 docker {
                     image 'sonarsource/sonar-scanner-cli:4.7.0'
+                    args '-u root:root'
                 }
             }
             environment {
@@ -90,7 +80,7 @@ pipeline {
             steps {
                 script {
                     // Define your Docker Hub username and access token
-                    def dockerHubUser = 'kisito2'
+                    def dockerHubUser = 'devopseasylearning'
                     def dockerHubAccessToken = 'dckr_pat_BsJ_HqhkoOw66SYpHsK7q5EcCBw'
 
                     // Docker login command with access token
@@ -101,83 +91,67 @@ pipeline {
 
         stage('Build auth') {
             steps {
-                script {
-                    sh '''
-                        cd $WORKSPACE/weatherapp/auth
-                        docker build -t kisito2/weatherapp-auth:${BUILD_NUMBER} .
-                    '''
-                }
+                sh '''
+                    cd $WORKSPACE/weatherapp/auth
+                    docker build -t devopseasylearning/weatherapp-auth:${BUILD_NUMBER} .
+                '''
             }
         }
 
         stage('Build UI') {
             steps {
-                script {
-                    sh '''
-                        cd $WORKSPACE/weatherapp/UI
-                        docker build -t kisito2/weatherapp-ui:${BUILD_NUMBER} .
-                    '''
-                }
+                sh '''
+                    cd $WORKSPACE/weatherapp/UI
+                    docker build -t devopseasylearning/weatherapp-ui:${BUILD_NUMBER} .
+                '''
             }
         }
 
-        stage('Build weather') {
+        stage('Build Weather') {
             steps {
-                script {
-                    sh '''
-                        cd $WORKSPACE/weatherapp/weather
-                        docker build -t kisito2/weatherapp-weather:${BUILD_NUMBER} .
-                    '''
-                }
+                sh '''
+                    cd $WORKSPACE/weatherapp/weather
+                    docker build -t devopseasylearning/weatherapp-weather:${BUILD_NUMBER} .
+                '''
             }
         }
 
-        stage('Build DB') {
+        stage('Build Redis') {
             steps {
-                script {
-                    sh '''
-                        cd $WORKSPACE/weatherapp/DB
-                        docker build -t kisito2/weatherapp-db:${BUILD_NUMBER} .
-                    '''
-                }
+                sh '''
+                    cd $WORKSPACE/weatherapp/redis
+                    docker build -t devopseasylearning/weatherapp-redis:${BUILD_NUMBER} .
+                '''
             }
         }
 
-        stage('Build REDIS') {
+        stage('Build db') {
             steps {
-                script {
-                    sh '''
-                        cd $WORKSPACE/weatherapp/REDIS
-                        docker build -t kisito2/weatherapp-redis:${BUILD_NUMBER} .
-                    '''
-                }
-            }
-        }
-
-        stage('Post-build') {
-            post {
-                success {
-                    script {
-                        slackSend (channel: 'session5-november-2022', color: 'good', message: "The Weatherapp_multibranch_pipeline SUCCESSFUL: Branch name <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-                    }
-                }
-
-                unstable {
-                    script {
-                        slackSend (channel: 'session5-november-2022', color: 'warning', message: "The Weatherapp_multibranch_pipeline UNSTABLE: Branch name <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-                    }
-                }
-
-                failure {
-                    script {
-                        slackSend (channel: 'session5-november-2022', color: '#FF0000', message: "The Weatherapp_multibranch_pipeline FAILURE: Branch name <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-                    }
-                }
-
-                cleanup {
-                    deleteDir()
-                }
+                sh '''
+                    cd $WORKSPACE/weatherapp/db
+                    docker build -t devopseasylearning/weatherapp-db:${BUILD_NUMBER} .
+                '''
             }
         }
     }
+
+    post {
+        success {
+            slackSend(channel: 'session5-november-2022', color: 'good', message: "Application The_Weather_app SUCCESSFUL:  Branch name  <<${env.BRANCH_NAME}>>  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+        }
+
+        unstable {
+            slackSend(channel: 'session5-november-2022', color: 'warning', message: "Application The_Weather_app UNSTABLE:  Branch name  <<${env.BRANCH_NAME}>>  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+        }
+
+        failure {
+            slackSend(channel: 'session5-november-2022', color: '#FF0000', message: "Application The_Weather_app FAILURE:  Branch name  <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+        }
+
+        cleanup {  
+          deleteDir()
+        }
+    }  
+
+   
 }
