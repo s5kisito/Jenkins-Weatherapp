@@ -173,3 +173,22 @@ pipeline {
 }
 
 }
+
+
+post {
+        success {
+            slackSend(channel: 'session5-november-2022', color: 'good', message: "Application The_Weather_app SUCCESSFUL:  Branch name  <<${env.BRANCH_NAME}>>  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+        }
+
+        unstable {
+            slackSend(channel: 'session5-november-2022', color: 'warning', message: "Application The_Weather_app UNSTABLE:  Branch name  <<${env.BRANCH_NAME}>>  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+        }
+
+        failure {
+            slackSend(channel: 'session5-november-2022', color: '#FF0000', message: "Application The_Weather_app FAILURE:  Branch name  <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+        }
+
+        cleanup {  
+          deleteDir()
+        }
+}
