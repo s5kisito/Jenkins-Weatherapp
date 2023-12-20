@@ -1,7 +1,7 @@
 
 pipeline {
     agent {
-        label ("deploy-branches")
+        label ("BRANCH_ON_DEMAND")
     }
 	
     options {
@@ -144,7 +144,7 @@ pipeline {
         }
         stage('Generate-compose') {
           agent {
-             label "deploy-branches"
+             label "BRANCH_ON_DEMAND"
           }
         
     
@@ -252,7 +252,7 @@ cat docker-compose.yaml
     
         stage('Deploy') {
             agent { 
-                label "deploy-branches"
+                label "BRANCH_ON_DEMAND"
             }
             
             
