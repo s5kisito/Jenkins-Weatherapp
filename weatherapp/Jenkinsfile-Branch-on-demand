@@ -315,26 +315,26 @@ fi
     }      
     
 
-   post {
+  //  post {
    
-   success {
-      slackSend (channel: 'session5-november-2022', color: 'good', message: " $DEPLOYER_NAME, Application The_Weather_app SUCCESSFUL and will be available for $KEEP_ALIVE second :  Branch name  <<${BRANCH_TO_DEPLOY_FROM}>>  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-    }
+  //  success {
+  //     slackSend (channel: 'session5-november-2022', color: 'good', message: " $DEPLOYER_NAME, Application The_Weather_app SUCCESSFUL and will be available for $KEEP_ALIVE second :  Branch name  <<${BRANCH_TO_DEPLOY_FROM}>>  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+  //   }
 
  
-    unstable {
-      slackSend (channel: 'session5-november-2022', color: 'warning', message: "$DEPLOYER_NAME, Application The_Weather_app UNSTABLE:  Branch name  <<${BRANCH_TO_DEPLOY_FROM}>>  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-    }
+  //   unstable {
+  //     slackSend (channel: 'session5-november-2022', color: 'warning', message: "$DEPLOYER_NAME, Application The_Weather_app UNSTABLE:  Branch name  <<${BRANCH_TO_DEPLOY_FROM}>>  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+  //   }
 
-    failure {
-      slackSend (channel: 'session5-november-2022', color: '#FF0000', message: "$DEPLOYER_NAME, Application The_Weather_app FAILURE:  Branch name  <<${BRANCH_TO_DEPLOY_FROM}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-    }
+  //   failure {
+  //     slackSend (channel: 'session5-november-2022', color: '#FF0000', message: "$DEPLOYER_NAME, Application The_Weather_app FAILURE:  Branch name  <<${BRANCH_TO_DEPLOY_FROM}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+  //   }
    
-    cleanup {
-      deleteDir()
-    }
+  //   cleanup {
+  //     deleteDir()
+  //   }
 
-   }
+  //  }
 
    
 }
