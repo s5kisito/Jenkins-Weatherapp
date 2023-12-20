@@ -153,31 +153,29 @@ pipeline {
                 }
             }
         }
+    }
 
-        stage('Post-build') {
-            post {
-                success {
-                    script {
-                        slackSend (channel: 'session5-november-2022', color: 'good', message: "The Weatherapp_multibranch_pipeline SUCCESSFUL: Branch name <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-                    }
-                }
-
-                unstable {
-                    script {
-                        slackSend (channel: 'session5-november-2022', color: 'warning', message: "The Weatherapp_multibranch_pipeline UNSTABLE: Branch name <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-                    }
-                }
-
-                failure {
-                    script {
-                        slackSend (channel: 'session5-november-2022', color: '#FF0000', message: "The Weatherapp_multibranch_pipeline FAILURE: Branch name <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-                    }
-                }
-
-                cleanup {
-                    deleteDir()
-                }
+    post {
+        success {
+            script {
+                slackSend (channel: 'session5-november-2022', color: 'good', message: "The Weatherapp_multibranch_pipeline SUCCESSFUL: Branch name <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
             }
+        }
+
+        unstable {
+            script {
+                slackSend (channel: 'session5-november-2022', color: 'warning', message: "The Weatherapp_multibranch_pipeline UNSTABLE: Branch name <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+            }
+        }
+
+        failure {
+            script {
+                slackSend (channel: 'session5-november-2022', color: '#FF0000', message: "The Weatherapp_multibranch_pipeline FAILURE: Branch name <<${env.BRANCH_NAME}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+            }
+        }
+
+        cleanup {
+            deleteDir()
         }
     }
 }
