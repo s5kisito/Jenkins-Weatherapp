@@ -83,7 +83,7 @@ pipeline {
 				sh '''
                 rm -rf * || true 
                 git clone -b $BRANCH_TO_DEPLOY_FROM git@github.com:s5kisito/Jenkins-Weatherapp.git 
-                cd $WORKSPACE/Jenkins-Weatherapp
+                cd $WORKSPACE/weatherapp
                   '''
 			}
 		}
@@ -338,3 +338,6 @@ fi
 
    
 }
+    
+    
+
