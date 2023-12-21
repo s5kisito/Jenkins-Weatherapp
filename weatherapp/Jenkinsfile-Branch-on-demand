@@ -1,7 +1,7 @@
 
 pipeline {
     agent {
-        label ("BRANCH_ON_DEMAND")
+        label ("PRODUCTION")
     }
 	
     options {
@@ -252,7 +252,7 @@ cat docker-compose.yaml
     
         stage('Deploy') {
             agent { 
-                label "BRANCH_ON_DEMAND"
+                label "PRODUCTION"
             }
             
             
