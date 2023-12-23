@@ -77,16 +77,28 @@ pipeline {
                 }
             }
         }
-        stage('cloning') {
+        stage('Cloning') {
+    steps {
+        script {
+            def repositoryURL = 'git@github.com:s5kisito/Jenkins-Weatherapp.git'
+            def workspace = "${WORKSPACE}/weatherapp"
 
-			steps {
-				sh '''
-                rm -rf * || true 
-                git clone -b $BRANCH_TO_DEPLOY_FROM git@github.com:s5kisito/Jenkins-Weatherapp.git 
-                cd $WORKSPACE/weatherapp
-                  '''
-			}
-		}
+            // Remove existing content (if any) in the workspace
+            deleteDir()
+
+            // Clone the repository with the specified branch
+            checkout([$class: 'GitSCM',
+                branches: [[name: "refs/heads/${BRANCH_TO_DEPLOY_FROM}"]],
+                doGenerateSubmoduleConfigurations: false,
+                extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'weatherapp']],
+                submoduleCfg: [],
+                userRemoteConfigs: [[url: repositoryURL]]
+            ])
+        }
+    }
+    
+
+
 
         stage('Build auth') {
             steps {
@@ -337,6 +349,7 @@ fi
   //  }
 
    
+    }
 }
     
     
