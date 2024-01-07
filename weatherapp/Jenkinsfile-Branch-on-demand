@@ -1,98 +1,118 @@
+    
 pipeline {
     agent {
-        label "BRANCH_ON_DEMAND"
+        label ("BRANCH_ON_DEMAND")
     }
-
+	
     options {
         buildDiscarder(logRotator(numToKeepStr: '5'))
         disableConcurrentBuilds()
         timeout(time: 1, unit: 'HOURS') 
         timestamps()
-    }
-
-    parameters {
-        string(
-            name: 'BRANCH_TO_DEPLOY_FROM',
-            defaultValue: '',
-            description: 'Enter the Branch name you would like to deploy'
-        )
-        string(
-            name: 'DEPLOYER_NAME',
-            defaultValue: '',
-            description: 'Enter your name'
-        )
-        choice(
-            choices: ['300', '450', '600', '750', '900'], 
-            name: 'KEEP_ALIVE'
-        )
-    }
-
+      }
     stages {
-        stage('check entry') {
-            steps {
-                sh ''' 
-                    #!/bin/bash
-                    # Check if BRANCH_TO_DEPLOY_FROM is not empty
-                    if [ -z "$BRANCH_TO_DEPLOY_FROM" ]; then
-                        echo "Error: BRANCH_TO_DEPLOY_FROM is empty"
-                        exit 1
-                    fi
-                    
-                    # Check if DEPLOYER_NAME is not empty
-                    if [ -z "$DEPLOYER_NAME" ]; then
-                        echo "Error: DEPLOYER_NAME is empty"
-                        exit 1
-                    fi
-                    
-                    # Your deployment script logic goes here
-                    echo "Starting deployment from branch '$BRANCH_TO_DEPLOY_FROM' by '$DEPLOYER_NAME'"
-                    
-                    # Rest of the script...
-                '''
-            }
-        }
-
-        stage('Login to Docker Hub') {  
+        stage('Setup parameters') {
             steps {
                 script {
-                    def dockerHubUser = 'kisito2'
-                    def dockerHubAccessToken = 'dckr_pat_BsJ_HqhkoOw66SYpHsK7q5EcCBw'
+                    properties([
+                        parameters([
 
-                    sh "echo ${dockerHubAccessToken} | docker login -u ${dockerHubUser} --password-stdin"
+                             string(name: 'BRANCH_TO_DEPLOY_FROM',
+                             defaultValue: '',
+                            description: '''Enter the Branch name you would like to deploy'''),
+
+
+                             string(name: 'DEPLOYER_NAME',
+                             defaultValue: '',
+                            description: '''Enter your name'''),
+
+
+                        choice(
+                            choices: ['300', '450', '600', '750', '900'], 
+                            name: 'KEEP_ALIVE'
+                                 
+                                ),
+
+                        ])
+                    ])
                 }
             }
         }
 
-        stage('cloning') {
-    steps {
-        script {
-            sh '''
-                rm -rf * || true
-                GIT_SSH_COMMAND="ssh -i /home/ubuntu/.ssh/id_rsa" git clone -b $BRANCH_TO_DEPLOY_FROM git@github.com:s5kisito/Jenkins-Weatherapp.git
-                cd $WORKSPACE/weatherapp
-            '''
-        }
-    }
-}
+    stage('check entry') {
 
+			steps {
+				sh ''' 
+                #!/bin/bash
+
+                 # Check if BRANCH_TO_DEPLOY_FROM is not empty
+                 if [ -z "$BRANCH_TO_DEPLOY_FROM" ]; then
+                     echo "Error: BRANCH_TO_DEPLOY_FROM is empty"
+                     exit 1
+                 fi
+                 
+                 # Check if DEPLOYER_NAME is not empty
+                 if [ -z "$DEPLOYER_NAME" ]; then
+                     echo "Error: DEPLOYER_NAME is empty"
+                     exit 1
+                 fi
+                 
+                 # Your deployment script logic goes here
+                 echo "Starting deployment from branch '$BRANCH_TO_DEPLOY_FROM' by '$DEPLOYER_NAME'"
+                 
+                 # Rest of the script...
+
+                '''
+			}
+		}
+        stage('Login to Docker Hub') {  
+            steps {
+                script {
+                    // Define your Docker Hub username and access token
+                    def dockerHubUser = 'kisito2'
+                    def dockerHubAccessToken = 'dckr_pat_BsJ_HqhkoOw66SYpHsK7q5EcCBw'
+
+                    // Docker login command with access token
+                    sh "echo ${dockerHubAccessToken} | docker login -u ${dockerHubUser} --password-stdin"
+                }
+            }
+        }
+        stage('cloning') {
+            steps {
+                script {
+                        // Clone the Git repository
+                        sh '''
+                            rm -rf * || true 
+                            git clone -b $BRANCH_TO_DEPLOY_FROM git@github.com:s5kisito/Jenkins-Weatherapp.git 
+                            cd $WORKSPACE/Jenkins-weatherapp
+                        '''
+                    }
+                }
+            }
+        }
 
         stage('Build auth') {
             steps {
-                sh '''
-                    cd $WORKSPACE/weatherapp/auth
-                    docker build -t kisito2/weatherapp-auth:${BUILD_NUMBER} .
-                '''
+                script {
+                    sh '''
+                        cd $WORKSPACE/weatherapp/auth
+                        docker build -t kisito2/weatherapp-auth:${BUILD_NUMBER} .
+                    '''
+                }
             }
         }
 
         stage('Build UI') {
             steps {
-                sh '''
-                    cd $WORKSPACE/weatherapp/UI
-                    docker build -t kisito2/weatherapp-ui:${BUILD_NUMBER} .
-                '''
+                script {
+                    sh '''
+                        cd $WORKSPACE/weatherapp/UI
+                        docker build -t kisito2/weatherapp-ui:${BUILD_NUMBER} .
+                    '''
+                }
             }
         }
+
         stage('Build weather') {
             steps {
                 script {
@@ -257,6 +277,9 @@ cat docker-compose.yaml
             }
         }
 
+
+
+
         stage('checking website') {
             steps {
                 sh '''
@@ -292,11 +315,34 @@ fi
                 '''
             }
         }
-    } 
+    }      
+    
 
-        
+  //  post {
+   
+  //  success {
+  //     slackSend (channel: 'session5-november-2022', color: 'good', message: " $DEPLOYER_NAME, Application The_Weather_app SUCCESSFUL and will be available for $KEEP_ALIVE second :  Branch name  <<${BRANCH_TO_DEPLOY_FROM}>>  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+  //   }
 
-    // post {
-    //     // Your existing post configuration...
-    // }
-}
+ 
+  //   unstable {
+  //     slackSend (channel: 'session5-november-2022', color: 'warning', message: "$DEPLOYER_NAME, Application The_Weather_app UNSTABLE:  Branch name  <<${BRANCH_TO_DEPLOY_FROM}>>  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+  //   }
+
+  //   failure {
+  //     slackSend (channel: 'session5-november-2022', color: '#FF0000', message: "$DEPLOYER_NAME, Application The_Weather_app FAILURE:  Branch name  <<${BRANCH_TO_DEPLOY_FROM}>> Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+  //   }
+   
+  //   cleanup {
+  //     deleteDir()
+  //   }
+
+  //  }
+
+   
+
+
+    
+    
+
+
