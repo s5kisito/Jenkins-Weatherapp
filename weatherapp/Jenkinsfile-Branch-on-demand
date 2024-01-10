@@ -235,14 +235,14 @@ cat <<EOF > /home/ubuntu/docker-compose.yml
     redis-data:
 EOF
 	            '''
-	          }
+	          
 
 	        }
 
 	      }
 
 	    }
-    }
+    
 
         stage('Deploy') {
             agent {
@@ -300,11 +300,12 @@ EOF
                 '''
             }
         }
+    }
 
-    }    
+}    
 
     
-}
+
 
 
   //  post {
