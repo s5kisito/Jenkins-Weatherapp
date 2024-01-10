@@ -142,7 +142,8 @@ pipeline {
         stage('Generate-compose') {
           
           agent {
-            label("BRANCH_ON_DEMAND")
+        label("BRANCH_ON_DEMAND")
+    }
  
 	      steps {
 	        script {
